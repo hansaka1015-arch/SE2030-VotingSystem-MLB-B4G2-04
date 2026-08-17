@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRIGHTSTAR VOTING - Reality Show Voting Platform | SE2030 MLB-B4G2-04</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            900: '#4c1d95',
+                            accent: '#ec4899',
+                        },
+                        dark: {
+                            base: '#07090e',
+                            card: '#0f1420',
+                            border: '#1e293b',
+                            hover: '#182030'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float-up': 'floatUp 2.5s ease-out forwards',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        floatUp: {
+                            '0%': { transform: 'translateY(0) scale(0.8)', opacity: '1' },
+                            '100%': { transform: 'translateY(-180px) scale(1.4)', opacity: '0' }
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 10px rgba(139, 92, 246, 0.4)' },
+                            '100%': { boxShadow: '0 0 25px rgba(236, 72, 153, 0.7)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #07090e;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(15, 20, 32, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(24, 32, 48, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #07090e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8b5cf6;
+        }
+
+        .floating-emoji {
+            position: absolute;
+            pointer-events: none;
+            font-size: 2rem;
+            z-index: 50;
+            animation: floatUp 2s ease-out forwards;
+        }
+
+        .broadcast-aspect {
+            aspect-ratio: 16 / 9;
+        }
+    </style>
+</head>
+
+<body class="antialiased text-slate-200 min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80 px-4 lg:px-6 py-3 flex items-center justify-between">
+        <!-- Left: Logo & Context -->
+        <div class="flex items-center space-x-4">
+            <button id="mobile-menu-btn" class="lg:hidden text-slate-400 hover:text-white focus:outline-none">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('public-home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-extrabold tracking-tight text-white flex items-center gap-1.5">
+                        BRIGHTSTAR <span class="text-brand-500">VOTING</span>
+                    </span>
+                    <p class="text-[11px] text-slate-400 font-medium hidden sm:block">VOICE OF LANKA 2026 • SE2030 B4G2-04</p>
+                </div>
+            </div>
+
+            <!-- Broadcast Status Badge -->
+            <div class="hidden md:flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3 py-1 rounded-full text-xs">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 -ml-5"></span>
+                <span class="font-bold text-red-400 tracking-wider">LIVE ON AIR</span>
+                <span class="text-slate-600">•</span>
+                <span class="text-slate-300 font-semibold">EPISODE 08: FINALS</span>
+            </div>
+        </div>
+
+        <!-- Center: Dynamic Mode Switcher (Role Switcher for Evaluation) -->
+        <div class="hidden lg:flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <button id="mode-viewer-btn" onclick="setRoleMode('viewer')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 bg-brand-600 text-white shadow-md">
+                <i class="fa-solid fa-user text-xs"></i> Public Viewer Portal
+            </button>
+            <button id="mode-producer-btn" onclick="setRoleMode('producer')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-xs"></i> TV Producer Control Room
+            </button>
+        </div>
+
+        <!-- Right: Countdown & Profile -->
+        <div class="flex items-center space-x-3">
+            <div class="hidden sm:flex flex-col items-end mr-2">
+                <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Voting Closes In</span>
+                <span id="global-timer" class="font-mono text-sm font-bold text-brand-accent">02 : 14 : 36</span>
+            </div>
+
+            <button onclick="triggerToast('Notifications up to date', 'info')" class="relative p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+                <i class="fa-solid fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-brand-accent"></span>
+            </button>
+
+            <!-- User Profile Avatar Badge -->
+            <div class="flex items-center space-x-3 border-l border-slate-800 pl-3">
+                <div class="relative cursor-pointer" onclick="toggleDevModal()">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="User" class="w-9 h-9 rounded-xl object-cover ring-2 ring-brand-500/50">
+                    <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-slate-950"></span>
+                </div>
+                <div class="hidden xl:block cursor-pointer" onclick="toggleDevModal()">
+                    <div class="text-xs font-bold text-slate-200">Hettiarachchi D.K.S.H.</div>
+                    <div class="text-[10px] text-brand-500 font-semibold">Show Operations Lead</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- SIDEBAR NAVIGATION (Desktop) -->
+        <aside id="sidebar" class="hidden lg:flex flex-col w-64 bg-dark-base border-r border-slate-800/80 p-4 space-y-6 flex-shrink-0 justify-between overflow-y-auto">
+            <div class="space-y-6">
+                <!-- Viewer Menu Section -->
+                <div>
+                    <div class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500 px-3 mb-2">Public Fan Experience</div>
+                    <nav class="space-y-1">
+                        <button onclick="switchTab('public-home')" class="nav-item active w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="public-home">
+                            <i class="fa-solid fa-house w-5 text-center text-brand-500"></i>
+                            <span>Home & Live Stream</span>
+                        </button>
+                        <button onclick="switchTab('contestants')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="contestants">
+                            <i class="fa-solid fa-users-viewfinder w-5 text-center text-purple-400"></i>
+                            <span>Contestants Bios</span>
+                        </button>
+                        <button onclick="switchTab('live-leaderboard')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="live-leaderboard">
+                            <i class="fa-solid fa-trophy w-5 text-center text-amber-400"></i>
+                            <span>Live Leaderboard</span>
+                        </button>
+                        <button onclick="switchTab('fan-wall')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="fan-wall">
+                            <i class="fa-solid fa-comments w-5 text-center text-brand-accent"></i>
+                            <span>Fan Reaction Wall</span>
+                        </button>
+                        <button onclick="switchTab('fan-polls')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="fan-polls">
+                            <i class="fa-solid fa-square-poll-vertical w-5 text-center text-cyan-400"></i>
+                            <span>Interactive Fan Polls</span>
+                        </button>
+                        <button onclick="switchTab('live-reactions-demo')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="live-reactions-demo">
+                            <i class="fa-solid fa-heart-pulse w-5 text-center text-rose-500"></i>
+                            <span>Live Reactions Trigger</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Producer / Management Section -->
+                <div>
+                    <div class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500 px-3 mb-2">TV Production & Analytics</div>
+                    <nav class="space-y-1">
+                        <button onclick="switchTab('producer-dashboard')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="producer-dashboard">
+                            <i class="fa-solid fa-display w-5 text-center text-emerald-400"></i>
+                            <span>Producer Control Room</span>
+                        </button>
+                        <button onclick="switchTab('broadcast-overlay')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="broadcast-overlay">
+                            <i class="fa-solid fa-tv w-5 text-center text-indigo-400"></i>
+                            <span>16:9 TV Broadcast View</span>
+                        </button>
+                        <button onclick="switchTab('participation-analytics')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="participation-analytics">
+                            <i class="fa-solid fa-chart-line w-5 text-center text-blue-400"></i>
+                            <span>Audience Metrics</span>
+                        </button>
+                        <button onclick="switchTab('campaign-management')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-900 hover:text-white" data-tab="campaign-management">
+                            <i class="fa-solid fa-bullhorn w-5 text-center text-orange-400"></i>
+                            <span>Promotional Campaigns</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- System Status Card -->
+            <div class="glass-card p-3.5 rounded-2xl border border-slate-800 text-xs space-y-2">
+                <div class="flex items-center space-x-2 text-slate-400 font-bold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>System Status: <span class="text-emerald-400">Operational</span></span>
+                </div>
+                <div class="text-[10px] text-slate-500 font-medium">
+                    Version: v4.2.0-prod
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto bg-dark-base p-4 lg:p-8 relative">
+
+            <!-- 1. PUBLIC VIEWER PORTAL - HOME VIEW -->
+            <section id="tab-public-home" class="tab-content space-y-8">
+                <!-- Hero Section -->
+                <div class="relative rounded-3xl overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 via-slate-900 to-purple-950/40 p-6 lg:p-12">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.15),transparent_50%)]"></div>
+                    <div class="relative z-10 max-w-2xl space-y-6">
+                        <div class="inline-flex items-center space-x-2 bg-red-500/10 border border-red-500/30 px-3.5 py-1.5 rounded-full text-xs font-bold text-red-400">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                            <span>THE SHOW IS LIVE NOW</span>
+                        </div>
+                        <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-none">
+                            WHO DESERVES TO STAY? <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-brand-accent">YOUR VOTE COUNTS!</span>
+                        </h1>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Episode 08 Grand Finals are underway. Vote for your favorite contestants in real time and protect them from elimination tonight.
+                        </p>
+
+                        <!-- Voting Countdown Box -->
+                        <div class="flex flex-wrap items-center gap-4 pt-2">
+                            <div class="bg-slate-900/90 border border-slate-800 px-4 py-2.5 rounded-2xl flex items-center space-x-3">
+                                <i class="fa-solid fa-clock text-brand-accent text-lg"></i>
+                                <div>
+                                    <div class="text-[10px] uppercase font-bold text-slate-400">Voting Closes In</div>
+                                    <div class="font-mono font-black text-lg text-white">02 : 14 : 36</div>
+                                </div>
+                            </div>
+                            <button onclick="switchTab('contestants')" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-brand-600 to-brand-accent hover:from-brand-500 hover:to-pink-500 text-white font-extrabold shadow-lg shadow-brand-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-3">
+                                <i class="fa-solid fa-check-to-slot"></i> VOTE NOW
+                            </button>
+                            <button onclick="switchTab('live-leaderboard')" class="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold transition flex items-center gap-2">
+                                <i class="fa-solid fa-trophy text-amber-400"></i> View Leaderboard
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Decorative Show Art Floating Card -->
+                    <div class="hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 w-80 rounded-2xl border border-slate-700/60 overflow-hidden shadow-2xl bg-slate-900/90 transform rotate-2 hover:rotate-0 transition duration-500">
+                        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80" alt="Show Stage" class="w-full h-48 object-cover">
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between text-xs font-bold text-slate-400">
+                                <span>LIVE STAGE</span>
+                                <span class="text-red-400">38,420 Viewers</span>
+                            </div>
+                            <div class="font-bold text-white text-sm">Star Search 2026 Grand Arena</div>
+                            <div class="text-xs text-slate-400">Host: Marcus Vance • Episode 08</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Contestants Carousel / Quick Vote Row -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-extrabold text-white">Active Voting Contestants</h2>
+                            <p class="text-xs text-slate-400">Select a contestant to cast your vote directly</p>
+                        </div>
+                        <button onclick="switchTab('contestants')" class="text-xs font-bold text-brand-500 hover:text-brand-accent transition">
+                            View All (5) <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="home-contestants-grid">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Quick Interactive Fan Feed Preview -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Live Leaderboard Preview Card -->
+                    <div class="glass-panel p-6 rounded-3xl space-y-4 lg:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 rounded-full bg-red-500 animate-ping"></div>
+                                <h3 class="font-extrabold text-white text-lg">Top Contenders Right Now</h3>
+                            </div>
+                            <button onclick="switchTab('live-leaderboard')" class="text-xs text-brand-500 hover:underline font-bold">Full Leaderboard &rarr;</button>
+                        </div>
+                        <div class="space-y-3" id="home-leaderboard-preview">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Fan Buzz Preview -->
+                    <div class="glass-panel p-6 rounded-3xl space-y-4">
+                        <h3 class="font-extrabold text-white text-lg flex items-center justify-between">
+                            <span>Live Fan Buzz</span>
+                            <span class="text-xs text-brand-accent font-normal"><i class="fa-solid fa-fire"></i> Trending</span>
+                        </h3>
+                        <div class="space-y-3" id="home-fan-buzz">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                        <button onclick="switchTab('fan-wall')" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold border border-slate-800">
+                            Join the Conversation
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. CONTESTANT PROFILES LISTING VIEW -->
+            <section id="tab-contestants" class="tab-content hidden space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-black text-white">Contestant Profiles</h1>
+                        <p class="text-xs text-slate-400">Browse official biographies, media clips, and cast your votes</p>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="filterContestants('ALL')" class="filter-btn active px-4 py-2 rounded-xl text-xs font-bold bg-brand-600 text-white" data-filter="ALL">All Contestants</button>
+                        <button onclick="filterContestants('ACTIVE')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800" data-filter="ACTIVE">Active</button>
+                        <button onclick="filterContestants('SAFE')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800" data-filter="SAFE">Safe</button>
+                        <button onclick="filterContestants('AT RISK')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800" data-filter="AT RISK">At Risk</button>
+                        <button onclick="filterContestants('ELIMINATED')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800" data-filter="ELIMINATED">Eliminated</button>
+                    </div>
+                </div>
+
+                <!-- Contestants Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="contestants-full-grid">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- 3. LIVE LEADERBOARD VIEW -->
+            <section id="tab-live-leaderboard" class="tab-content hidden space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+                            <h1 class="text-2xl font-black text-white">LIVE LEADERBOARD</h1>
+                        </div>
+                        <p class="text-xs text-slate-400">Real-time vote aggregation updated every 3 seconds</p>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button onclick="simulateVoteBump()" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-xs font-bold text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-arrows-rotate text-brand-500"></i> Simulate Live Updates
+                        </button>
+                        <button onclick="switchTab('broadcast-overlay')" class="px-4 py-2 rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-600 hover:text-white text-xs font-bold transition flex items-center gap-2">
+                            <i class="fa-solid fa-tv"></i> Switch to TV Broadcast Mode
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Ticker -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase">Total Votes Cast</div>
+                            <div class="text-2xl font-black text-white mt-1" id="lb-total-votes">1,284,592</div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-brand-600/20 flex items-center justify-center text-brand-500 text-xl font-bold">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase">Votes Per Minute</div>
+                            <div class="text-2xl font-black text-brand-accent mt-1" id="lb-vpm">3,842</div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center text-brand-accent text-xl font-bold">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase">System Sync Status</div>
+                            <div class="text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
+                                <i class="fa-solid fa-wifi"></i> Connected • Updated Just Now
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl font-bold">
+                            <i class="fa-solid fa-server"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Table/List -->
+                <div class="glass-panel p-6 rounded-3xl space-y-4" id="leaderboard-container">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- 4. FAN WALL VIEW -->
+            <section id="tab-fan-wall" class="tab-content hidden space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-black text-white">Audience Fan Wall</h1>
+                        <p class="text-xs text-slate-400">See what viewers across the nation are saying about tonight's performances</p>
+                    </div>
+
+                    <button onclick="openPostModal()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-accent hover:from-brand-500 hover:to-pink-500 text-white font-bold text-xs shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square"></i> Post Message
+                    </button>
+                </div>
+
+                <!-- Feed Filter Chips -->
+                <div class="flex flex-wrap items-center gap-2" id="fan-wall-filters">
+                    <button onclick="filterFanWall('ALL')" class="fw-filter active px-4 py-1.5 rounded-full text-xs font-bold bg-brand-600 text-white">ALL POSTS</button>
+                    <!-- Contestant filter chips injected via JS -->
+                </div>
+
+                <!-- Fan Posts Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="fan-wall-grid">
+                    <!-- Injected dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- 5. INTERACTIVE FAN POLLS VIEW -->
+            <section id="tab-fan-polls" class="tab-content hidden space-y-6">
+                <div>
+                    <h1 class="text-2xl font-black text-white">Interactive Fan Polls</h1>
+                    <p class="text-xs text-slate-400">Voice your opinions on side questions and performance predictions</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="fan-polls-container">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- 6. LIVE REACTION TRIGGERS VIEW -->
+            <section id="tab-live-reactions-demo" class="tab-content hidden space-y-6">
+                <div class="text-center max-w-xl mx-auto space-y-3">
+                    <div class="inline-flex items-center space-x-2 bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-1 rounded-full text-xs font-bold">
+                        <i class="fa-solid fa-heart-pulse animate-pulse"></i>
+                        <span>REAL-TIME AUDIENCE FEEDBACK</span>
+                    </div>
+                    <h1 class="text-3xl font-black text-white">Express Your Reactions Live</h1>
+                    <p class="text-xs text-slate-400">Tap reaction buttons below to send live emotional feedback to the TV studio broadcast graphics panel.</p>
+                </div>
+
+                <!-- Reaction Matrix Centerpiece -->
+                <div class="glass-panel p-8 rounded-3xl max-w-2xl mx-auto relative overflow-hidden text-center space-y-8" id="reaction-container">
+                    <!-- Live Reaction Velocity Badge -->
+                    <div class="flex justify-center items-center space-x-6">
+                        <div class="text-center">
+                            <div class="text-[10px] uppercase font-bold text-slate-400">Total Live Reactions</div>
+                            <div id="live-reaction-total" class="text-3xl font-black text-white">28,492</div>
+                        </div>
+                        <div class="h-8 w-px bg-slate-800"></div>
+                        <div class="text-center">
+                            <div class="text-[10px] uppercase font-bold text-slate-400">Reactions / Min</div>
+                            <div id="live-reaction-rpm" class="text-3xl font-black text-brand-accent">1,248</div>
+                        </div>
+                    </div>
+
+                    <!-- Emoji Buttons Grid -->
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-4">
+                        <button onclick="triggerLiveReaction('❤️', 'Love')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-rose-500 transition transform active:scale-95 flex flex-col items-center group">
+                            <span class="text-4xl group-hover:scale-125 transition">❤️</span>
+                            <span class="text-xs font-bold text-slate-300 mt-2">Love</span>
+                            <span class="text-[10px] text-slate-500 font-mono mt-0.5" id="cnt-Love">12.4K</span>
+                        </button>
+                        <button onclick="triggerLiveReaction('🔥', 'Fire')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500 transition transform active:scale-95 flex flex-col items-center group">
+                            <span class="text-4xl group-hover:scale-125 transition">🔥</span>
+                            <span class="text-xs font-bold text-slate-300 mt-2">Fire</span>
+                            <span class="text-[10px] text-slate-500 font-mono mt-0.5" id="cnt-Fire">9.8K</span>
+                        </button>
+                        <button onclick="triggerLiveReaction('👏', 'Applause')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500 transition transform active:scale-95 flex flex-col items-center group">
+                            <span class="text-4xl group-hover:scale-125 transition">👏</span>
+                            <span class="text-xs font-bold text-slate-300 mt-2">Applause</span>
+                            <span class="text-[10px] text-slate-500 font-mono mt-0.5" id="cnt-Applause">4.2K</span>
+                        </button>
+                        <button onclick="triggerLiveReaction('😂', 'Funny')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-yellow-500 transition transform active:scale-95 flex flex-col items-center group">
+                            <span class="text-4xl group-hover:scale-125 transition">😂</span>
+                            <span class="text-xs font-bold text-slate-300 mt-2">Funny</span>
+                            <span class="text-[10px] text-slate-500 font-mono mt-0.5" id="cnt-Funny">1.1K</span>
+                        </button>
+                        <button onclick="triggerLiveReaction('😱', 'Shocked')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-purple-500 transition transform active:scale-95 flex flex-col items-center group">
+                            <span class="text-4xl group-hover:scale-125 transition">😱</span>
+                            <span class="text-xs font-bold text-slate-300 mt-2">Shocked</span>
+                            <span class="text-[10px] text-slate-500 font-mono mt-0.5" id="cnt-Shocked">620</span>
+                        </button>
+                        <button onclick="triggerLiveReaction('😢', 'Sad')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-blue-500 transition transform active:scale-95 flex flex-col items-center group">
+                            <span class="text-4xl group-hover:scale-125 transition">😢</span>
+                            <span class="text-xs font-bold text-slate-300 mt-2">Sad</span>
+                            <span class="text-[10px] text-slate-500 font-mono mt-0.5" id="cnt-Sad">340</span>
+                        </button>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 italic">Floating reaction particles simulate real-time WebSockets integration with studio overlay screens.</p>
+                </div>
+            </section>
+
+            <!-- 7. PRODUCER DASHBOARD & CONTROL ROOM VIEW -->
+            <section id="tab-producer-dashboard" class="tab-content hidden space-y-6">
+                <!-- TV Studio Header Controls -->
+                <div class="glass-panel p-6 rounded-3xl border border-red-500/30 space-y-4">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-2xl bg-red-600 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-red-600/40">
+                                <i class="fa-solid fa-tower-broadcast animate-pulse"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs font-black text-red-400 tracking-widest uppercase">PRODUCER CONTROL ROOM</span>
+                                    <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">MASTER SWITCH</span>
+                                </div>
+                                <h1 class="text-2xl font-black text-white">Broadcast Reality Control Desk</h1>
+                            </div>
+                        </div>
+
+                        <!-- Powerful Voting Master Buttons -->
+                        <div class="flex items-center space-x-3 bg-slate-950 p-2 rounded-2xl border border-slate-800">
+                            <button id="btn-start-voting" onclick="setVotingState('ACTIVE')" class="px-4 py-2 rounded-xl text-xs font-extrabold transition bg-emerald-600 hover:bg-emerald-500 text-white shadow-md flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> START VOTING
+                            </button>
+                            <button id="btn-pause-voting" onclick="setVotingState('PAUSED')" class="px-4 py-2 rounded-xl text-xs font-extrabold transition bg-amber-600 hover:bg-amber-500 text-white flex items-center gap-2">
+                                <i class="fa-solid fa-pause"></i> PAUSE
+                            </button>
+                            <button id="btn-end-voting" onclick="confirmEndVotingModal()" class="px-4 py-2 rounded-xl text-xs font-extrabold transition bg-red-600 hover:bg-red-500 text-white flex items-center gap-2">
+                                <i class="fa-solid fa-stop"></i> END VOTING
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Voting State Banner -->
+                    <div class="flex items-center justify-between bg-slate-900/90 p-3 rounded-xl border border-slate-800 text-xs">
+                        <div class="flex items-center justify-between bg-slate-900/90 p-3 rounded-xl border border-slate-800 text-xs">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-slate-400 font-semibold">Current State:</span>
+                                <span id="producer-voting-status-badge" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold border border-emerald-500/40 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVE & VOTING OPEN
+                                </span>
+                            </div>
+                            <div class="text-slate-400">
+                                Security Protocol: <span class="text-slate-200 font-mono">2FA VERIFIED (PRODUCER_04)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Velocity & Real-Time Trend Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl space-y-4 lg:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-extrabold text-white text-base">Live Vote Inflow Trend (Votes/Sec)</h3>
+                            <span class="text-xs text-brand-500 font-mono">Stream: Active WebSocket</span>
+                        </div>
+                        <div class="h-64 w-full">
+                            <canvas id="producerTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Broadcast Quick Preview Panel -->
+                    <div class="glass-panel p-6 rounded-3xl space-y-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-extrabold text-white text-base">TV Broadcast Overlay Preview</h3>
+                                <span class="text-[10px] uppercase bg-brand-600 px-2 py-0.5 rounded text-white font-bold">16:9 HD</span>
+                            </div>
+                            <p class="text-xs text-slate-400">Live preview of lower-third ranking graphic sent to studio monitors.</p>
+                        </div>
+
+                        <!-- Mini 16:9 Screen Simulation -->
+                        <div class="broadcast-aspect bg-slate-950 rounded-2xl border border-slate-700 p-4 flex flex-col justify-between relative overflow-hidden shadow-inner">
+                            <div class="flex justify-between items-center text-[10px] font-black tracking-widest text-red-500">
+                                <span>🔴 ON-AIR FEED</span>
+                                <span>EP 08 TOP 3</span>
+                            </div>
+                            <div class="space-y-1.5" id="producer-mini-preview">
+                                <!-- Populated dynamically -->
+                            </div>
+                            <div class="text-[9px] text-slate-500 text-right">STAR SEARCH REALITY GRAPHICS v4.2</div>
+                        </div>
+
+                        <button onclick="switchTab('broadcast-overlay')" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-350 font-bold text-xs border border-slate-800 transition">
+                            Open Fullscreen Studio Overlay
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Contestant Management Panel -->
+                <div class="glass-panel p-6 rounded-3xl space-y-6">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                            <h3 class="font-extrabold text-white text-lg">Contestant Elimination & Status Control</h3>
+                            <p class="text-xs text-slate-400">Mark safe, nominate for risk, or eliminate contestants in real time</p>
+                        </div>
+                        <button onclick="triggerToast('Please use the dynamic filters or details page to modify contestants', 'info')" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300">
+                            Bulk Action
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                                    <th class="pb-3">Contestant</th>
+                                    <th class="pb-3">ID</th>
+                                    <th class="pb-3">Current Votes</th>
+                                    <th class="pb-3">Percentage</th>
+                                    <th class="pb-3">Status</th>
+                                    <th class="pb-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="producer-table-body">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. BROADCAST LEADERBOARD (16:9 FULL OVERLAY VIEW) -->
+            <section id="tab-broadcast-overlay" class="tab-content hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-black text-white">16:9 TV Broadcast Overlay Graphic</h1>
+                        <p class="text-xs text-slate-400">High-contrast, minimal UI formatted for studio screens and television overlays</p>
+                    </div>
+                    <button onclick="toggleFullscreenBroadcast()" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-200 hover:text-white">
+                        <i class="fa-solid fa-expand mr-1.5"></i> Toggle Fullscreen Simulation
+                    </button>
+                </div>
+
+                <!-- 16:9 Aspect Frame Container -->
+                <div id="broadcast-frame" class="w-full broadcast-aspect bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-3xl border-2 border-brand-500/30 p-8 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+                    <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <!-- Top Bar Broadcast Graphic -->
+                    <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white text-xl font-black animate-pulse">
+                                🔴
+                            </div>
+                            <div>
+                                <div class="text-xs font-black uppercase tracking-widest text-red-500">LIVE VOTING RESULTS</div>
+                                <div class="text-2xl font-extrabold text-white tracking-tight">STAR SEARCH 2026 GRAND FINALS</div>
+                            </div>
+                        </div>
+                        <div class="text-right font-mono">
+                            <div class="text-xs text-slate-400">TOTAL VOTES LOGGED</div>
+                            <div class="text-2xl font-black text-brand-accent" id="broadcast-total-votes">1,284,592</div>
+                        </div>
+                    </div>
+
+                    <!-- Main Contestants Broadcast Cards -->
+                    <div class="grid grid-cols-3 gap-6 my-auto" id="broadcast-cards-container">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <!-- Bottom Ticker Bar Graphic -->
+                    <div class="bg-brand-900/40 border border-brand-500/30 rounded-2xl p-3 flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-400"></i> OFFICIAL REALITY SHOW VOTING PLATFORM • POWERED BY SE2030 GROUP 04
+                        </span>
+                        <span class="font-mono font-bold text-brand-500">UPDATED LIVE • VOTING CLOSES SOON</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 9. VIEWER PARTICIPATION METRICS ANALYTICS VIEW -->
+            <section id="tab-participation-analytics" class="tab-content hidden space-y-6">
+                <div>
+                    <h1 class="text-2xl font-black text-white">Viewer Participation Analytics</h1>
+                    <p class="text-xs text-slate-400">Executive metrics dashboard for Audience Engagement Managers</p>
+                </div>
+
+                <!-- Key Performance Indicators Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="glass-panel p-4 rounded-2xl space-y-1">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase">Total Participants</div>
+                        <div class="text-xl font-black text-white">124,582</div>
+                        <div class="text-[10px] text-emerald-400 font-bold"><i class="fa-solid fa-arrow-trend-up"></i> +14.2% vs Ep 07</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl space-y-1">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase">Active Viewers</div>
+                        <div class="text-xl font-black text-brand-500">38,421</div>
+                        <div class="text-[10px] text-emerald-400 font-bold"><i class="fa-solid fa-circle text-[8px]"></i> Peak Right Now</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl space-y-1">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase">Total Reactions</div>
+                        <div class="text-xl font-black text-brand-accent">842,391</div>
+                        <div class="text-[10px] text-emerald-400 font-bold"><i class="fa-solid fa-heart"></i> High Engagement</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl space-y-1">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase">Poll Turnout</div>
+                        <div class="text-xl font-black text-cyan-400">67,428</div>
+                        <div class="text-[10px] text-emerald-400 font-bold">54.1% Response Rate</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl space-y-1">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase">Avg Session Time</div>
+                        <div class="text-xl font-black text-amber-400">12m 42s</div>
+                        <div class="text-[10px] text-emerald-400 font-bold">+2m 10s vs Average</div>
+                    </div>
+                </div>
+
+                <!-- Charts Layout Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl space-y-4">
+                        <h3 class="font-extrabold text-white text-base">Viewer Participation Across Episodes</h3>
+                        <div class="h-64 w-full">
+                            <canvas id="episodesChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl space-y-4">
+                        <h3 class="font-extrabold text-white text-base">Reaction Activity Breakdown</h3>
+                        <div class="h-64 w-full">
+                            <canvas id="reactionsDoughnutChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 10. PROMOTIONAL CAMPAIGN MANAGEMENT VIEW -->
+            <section id="tab-campaign-management" class="tab-content hidden space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-black text-white">Promotional Campaigns</h1>
+                        <p class="text-xs text-slate-400">Manage voting incentive campaigns, double-vote weekends, and sponsor pushes</p>
+                    </div>
+
+                    <button onclick="openCreateCampaignModal()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-accent text-white font-bold text-xs shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Create Campaign
+                    </button>
+                </div>
+
+                <!-- Campaign List Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="campaigns-grid">
+                    <!-- Injected dynamically via JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION (Viewer Mode Only) -->
+    <nav class="lg:hidden sticky bottom-0 z-40 w-full glass-panel border-t border-slate-800 flex justify-around p-2">
+        <button onclick="switchTab('public-home')" class="mobile-nav-btn flex flex-col items-center py-1 text-brand-500" data-tab="public-home">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-bold mt-0.5">Home</span>
+        </button>
+        <button onclick="switchTab('contestants')" class="mobile-nav-btn flex flex-col items-center py-1 text-slate-400" data-tab="contestants">
+            <i class="fa-solid fa-users text-lg"></i>
+            <span class="text-[10px] font-bold mt-0.5">Contestants</span>
+        </button>
+        <button onclick="switchTab('live-leaderboard')" class="mobile-nav-btn flex flex-col items-center py-1 text-slate-400" data-tab="live-leaderboard">
+            <i class="fa-solid fa-trophy text-lg"></i>
+            <span class="text-[10px] font-bold mt-0.5">Leaderboard</span>
+        </button>
+        <button onclick="switchTab('fan-wall')" class="mobile-nav-btn flex flex-col items-center py-1 text-slate-400" data-tab="fan-wall">
+            <i class="fa-solid fa-comments text-lg"></i>
+            <span class="text-[10px] font-bold mt-0.5">Fan Wall</span>
+        </button>
+        <button onclick="switchTab('producer-dashboard')" class="mobile-nav-btn flex flex-col items-center py-1 text-slate-400" data-tab="producer-dashboard">
+            <i class="fa-solid fa-display text-lg"></i>
+            <span class="text-[10px] font-bold mt-0.5">Control Desk</span>
+        </button>
+    </nav>
+
+    <!-- MODAL: CONTESTANT DETAIL MODAL -->
+    <div id="modal-contestant-detail" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-700 p-6 lg:p-8 space-y-6 relative">
+            <button onclick="closeModal('modal-contestant-detail')" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div id="contestant-modal-body">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRM VOTE MODAL -->
+    <div id="modal-vote-confirm" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl border border-slate-700 p-6 text-center space-y-6">
+            <div class="w-16 h-16 rounded-full bg-brand-600/20 text-brand-500 text-3xl flex items-center justify-center mx-auto border border-brand-500/30">
+                <i class="fa-solid fa-check-to-slot"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-extrabold text-white">Confirm Your Official Vote</h3>
+                <p class="text-xs text-slate-400 mt-1">You are allocating 1 vote token to this contestant for Episode 08.</p>
+            </div>
+
+            <div class="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 flex items-center space-x-4 text-left" id="vote-modal-contestant-info">
+                <!-- Injected dynamically -->
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="closeModal('modal-vote-confirm')" class="w-1/2 py-3 rounded-xl bg-slate-900 border border-slate-800 font-bold text-xs text-slate-300">
+                    Cancel
+                </button>
+                <button onclick="executeCastVote()" class="w-1/2 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-brand-accent text-white font-extrabold text-xs shadow-lg shadow-brand-600/30">
+                    CONFIRM & SUBMIT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CREATE CAMPAIGN MODAL -->
+    <div id="modal-create-campaign" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-xl rounded-3xl border border-slate-700 p-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-extrabold text-white">Launch Promotional Campaign</h3>
+                <button onclick="closeModal('modal-create-campaign')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <form id="campaign-form" onsubmit="handleCreateCampaign(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Campaign Title</label>
+                    <input type="text" required placeholder="e.g. Double Vote Finals Weekend" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1">Start Date</label>
+                        <input type="date" required value="2026-08-20" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1">End Date</label>
+                        <input type="date" required value="2026-08-22" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Promotion Type</label>
+                    <select class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+                        <option>2x Vote Multiplier</option>
+                        <option>Free Bonus Vote Token</option>
+                        <option>Sponsor Contest Giveaway</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Campaign Description</label>
+                    <textarea rows="3" placeholder="Explain the campaign rules..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-brand-accent text-white font-extrabold text-xs shadow-lg">
+                    PUBLISH CAMPAIGN
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: POST FAN WALL MESSAGE -->
+    <div id="modal-post-fan-wall" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-slate-700 p-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-extrabold text-white">Post to Fan Wall</h3>
+                <button onclick="closeModal('modal-post-fan-wall')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <form onsubmit="handlePostFanWall(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Your Fan Handle</label>
+                    <input type="text" id="fw-input-author" required placeholder="@SuperFan2026" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Supporting Contestant</label>
+                    <select id="fw-input-tag" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+                        <option value="Alex Morgan">Alex Morgan (#01)</option>
+                        <option value="Sarah Williams">Sarah Williams (#02)</option>
+                        <option value="Daniel Carter">Daniel Carter (#03)</option>
+                        <option value="Mia Anderson">Mia Anderson (#04)</option>
+                        <option value="Ryan Cooper">Ryan Cooper (#05)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Message</label>
+                    <textarea id="fw-input-text" rows="3" required placeholder="Write your encouraging comment..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs shadow-lg">
+                    POST MESSAGE LIVE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ACCOUNT PROFILE MODAL -->
+    <div id="modal-dev-info" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl border border-slate-800 p-6 space-y-4 text-center">
+            <div class="relative w-20 h-20 mx-auto">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="User" class="w-20 h-20 rounded-2xl object-cover ring-4 ring-brand-500/30">
+                <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-4 border-slate-950"></span>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-white">Hettiarachchi D.K.S.H.</h3>
+                <p class="text-xs text-brand-500 font-bold mt-0.5">Show Operations Lead</p>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-xs text-left space-y-2.5">
+                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                    <span class="text-slate-400">Department</span>
+                    <strong class="text-white">Broadcast Operations</strong>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                    <span class="text-slate-400">Station / Console</span>
+                    <strong class="text-white">Colombo Studio 01</strong>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400">Access Level</span>
+                    <strong class="text-emerald-400">Administrator</strong>
+                </div>
+            </div>
+            <div class="space-y-2 pt-2">
+                <button onclick="triggerToast('Console settings saved successfully', 'success'); closeModal('modal-dev-info');" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition">
+                    Account Settings
+                </button>
+                <button onclick="closeModal('modal-dev-info')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- APPLICATION JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // MOCK DATA STORE (CONTESTANTS & APP STATE)
+        // ==========================================
+        const state = {
+            currentRole: 'viewer', // 'viewer' | 'producer'
+            votingState: 'ACTIVE', // 'ACTIVE' | 'PAUSED' | 'ENDED'
+            totalVotes: 1284592,
+            votesPerMin: 3842,
+            contestants: [
+                {
+                    id: 1,
+                    number: '#01',
+                    name: 'Alex Morgan',
+                    title: 'The Strategist',
+                    age: 24,
+                    location: 'Chicago, IL',
+                    occupation: 'Acoustic Vocalist',
+                    status: 'ACTIVE', // ACTIVE, SAFE, AT RISK, ELIMINATED
+                    voteCount: 421345,
+                    votePercentage: 32.8,
+                    trend: '+2',
+                    rank: 1,
+                    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+                    bio: 'Alex is known for high-energy acoustic performances and clever strategy in song selection.',
+                    journey: 'Dominating fan votes since Episode 3 with consistent vocal prowess.',
+                    media: [
+                        'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80',
+                        'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&auto=format&fit=crop&q=80'
+                    ]
+                },
+                {
+                    id: 2,
+                    number: '#02',
+                    name: 'Sarah Williams',
+                    title: 'The Powerhouse Vocalist',
+                    age: 22,
+                    location: 'Nashville, TN',
+                    occupation: 'Songwriter',
+                    status: 'SAFE',
+                    voteCount: 351978,
+                    votePercentage: 27.4,
+                    trend: '-1',
+                    rank: 2,
+                    photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80',
+                    bio: 'A soulful powerhouse singer who captivates judges and home viewers every week.',
+                    journey: 'Awarded Golden Buzzer in Auditions for original ballad composition.',
+                    media: [
+                        'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&auto=format&fit=crop&q=80'
+                    ]
+                },
+                {
+                    id: 3,
+                    number: '#03',
+                    name: 'Daniel Carter',
+                    title: 'The Rock Dynamo',
+                    age: 27,
+                    location: 'Austin, TX',
+                    occupation: 'Lead Guitarist & Vocalist',
+                    status: 'AT RISK',
+                    voteCount: 251780,
+                    votePercentage: 19.6,
+                    trend: '0',
+                    rank: 3,
+                    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80',
+                    bio: 'Brings raw rock attitude and electrification to every main stage episode.',
+                    journey: 'Fought back through bottom-two sing-off in Episode 5.',
+                    media: [
+                        'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&auto=format&fit=crop&q=80'
+                    ]
+                },
+                {
+                    id: 4,
+                    number: '#04',
+                    name: 'Mia Anderson',
+                    title: 'The Pop Prodigy',
+                    age: 19,
+                    location: 'Los Angeles, CA',
+                    occupation: 'Dancer & Vocalist',
+                    status: 'ACTIVE',
+                    voteCount: 155435,
+                    votePercentage: 12.1,
+                    trend: '+1',
+                    rank: 4,
+                    photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&auto=format&fit=crop&q=80',
+                    bio: 'Versatile performer blending modern pop dance choreography with sharp vocals.',
+                    journey: 'Fastest growing social media following among Season 4 contestants.',
+                    media: []
+                },
+                {
+                    id: 5,
+                    number: '#05',
+                    name: 'Ryan Cooper',
+                    title: 'The Country Crooner',
+                    age: 26,
+                    location: 'Denver, CO',
+                    occupation: 'Indie Artist',
+                    status: 'ELIMINATED',
+                    voteCount: 104054,
+                    votePercentage: 8.1,
+                    trend: '-2',
+                    rank: 5,
+                    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80',
+                    bio: 'Country story-teller with smooth acoustic timbre.',
+                    journey: 'Eliminated in Episode 7 after a memorable duet stage.',
+                    media: []
+                }
+            ],
+            fanPosts: [
+                { id: 101, author: '@SarahFanatics', text: 'Sarah absolutely destroyed that high note! Easily the performance of the season! 🔥', tag: 'Sarah Williams', likes: 2420, time: '2m ago' },
+                { id: 102, author: '@AlexMorganArmy', text: 'Alex Morgan is playing chess while everyone else plays checkers. Keep voting guys! 👏', tag: 'Alex Morgan', likes: 1842, time: '5m ago' },
+                { id: 103, author: '@RockNation', text: 'Daniel needs all our votes right now! Do not let him fall to elimination! 😱', tag: 'Daniel Carter', likes: 934, time: '12m ago' }
+            ],
+            fanPolls: [
+                {
+                    id: 1,
+                    title: 'Who delivered tonight\'s best vocal performance?',
+                    status: 'ACTIVE',
+                    closesIn: '01:24:38',
+                    totalVotes: 48291,
+                    hasVoted: false,
+                    selectedOption: null,
+                    options: [
+                        { name: 'Alex Morgan', percent: 42, count: 20282 },
+                        { name: 'Sarah Williams', percent: 31, count: 14970 },
+                        { name: 'Daniel Carter', percent: 18, count: 8692 },
+                        { name: 'Mia Anderson', percent: 9, count: 4347 }
+                    ]
+                },
+                {
+                    id: 2,
+                    title: 'Which theme song choice was most creative?',
+                    status: 'ENDED',
+                    closesIn: 'Closed',
+                    totalVotes: 61402,
+                    hasVoted: true,
+                    selectedOption: 0,
+                    options: [
+                        { name: 'Alex\'s Acoustic Reboot', percent: 55, count: 33771 },
+                        { name: 'Mia\'s Dance Remix', percent: 28, count: 17192 },
+                        { name: 'Sarah\'s Ballad', percent: 17, count: 10439 }
+                    ]
+                }
+            ],
+            campaigns: [
+                { id: 1, name: 'DOUBLE VOTE FINALS WEEKEND', status: 'ACTIVE', start: 'Aug 15, 2026', end: 'Aug 17, 2026', reach: '284K Viewers', engagement: '68%', type: '2x Vote Multiplier' },
+                { id: 2, name: 'MID-SEASON SPONSOR BONUS', status: 'SCHEDULED', start: 'Aug 20, 2026', end: 'Aug 22, 2026', reach: '150K Target', engagement: '0%', type: 'Free Bonus Vote Token' }
+            ],
+            pendingVoteContestant: null
+        };
+
+        // ==========================================
+        // INITIALIZATION & TAB SWITCHING LOGIC
+        // ==========================================
+        window.onload = function () {
+            renderHomeContestants();
+            renderHomeLeaderboard();
+            renderHomeFanBuzz();
+            renderFullContestants();
+            renderLeaderboard();
+            renderFanWall();
+            renderFanWallFilters();
+            renderFanPolls();
+            renderProducerPreview();
+            renderBroadcastOverlay();
+            renderCampaigns();
+            renderProducerTable();
+
+            // Initialize Analytics & Producer Charts
+            initProducerTrendChart();
+            initAnalyticsCharts();
+        };
+
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
+            // Show selected tab content
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.remove('hidden');
+
+            // Update desktop navigation active state
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('bg-slate-900', 'text-white', 'border-l-4', 'border-brand-500');
+                    btn.classList.remove('text-slate-300');
+                } else {
+                    btn.classList.remove('bg-slate-900', 'text-white', 'border-l-4', 'border-brand-500');
+                    btn.classList.add('text-slate-300');
+                }
+            });
+
+            // Update mobile navigation active state
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('text-brand-500');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('text-brand-500');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+        }
+
+        function setRoleMode(role) {
+            state.currentRole = role;
+            const viewerBtn = document.getElementById('mode-viewer-btn');
+            const producerBtn = document.getElementById('mode-producer-btn');
+
+            if (role === 'viewer') {
+                viewerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 bg-brand-600 text-white shadow-md';
+                producerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-2';
+                switchTab('public-home');
+                triggerToast('Switched to Public Viewer Experience', 'info');
+            } else {
+                producerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 bg-emerald-600 text-white shadow-md';
+                viewerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-2';
+                switchTab('producer-dashboard');
+                triggerToast('Switched to TV Producer Control Room Desk', 'warning');
+            }
+        }
+
+        // ==========================================
+        // UI RENDERING FUNCTIONS
+        // ==========================================
+        function renderHomeContestants() {
+            const container = document.getElementById('home-contestants-grid');
+            container.innerHTML = state.contestants.slice(0, 5).map(c => `
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-3 relative flex flex-col justify-between group hover:border-brand-500/50 transition">
+                    <div class="relative rounded-xl overflow-hidden aspect-square">
+                        <img src="${c.photo}" alt="${c.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-2 left-2 bg-slate-950/80 backdrop-blur px-2 py-0.5 rounded text-[10px] font-bold text-white">${c.number}</div>
+                        ${getStatusBadge(c.status)}
+                    </div>
+                    <div>
+                        <div class="text-xs text-brand-500 font-bold">${c.title}</div>
+                        <div class="text-sm font-extrabold text-white">${c.name}</div>
+                        <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+                            <span>Rank #${c.rank}</span>
+                            <span class="font-mono font-bold text-white">${c.votePercentage}%</span>
+                        </div>
+                    </div>
+                    ${c.status === 'ELIMINATED'
+                        ? `<button disabled class="w-full py-2 rounded-xl bg-slate-950 text-slate-600 font-bold text-xs cursor-not-allowed">INELIGIBLE</button>`
+                        : `<button onclick="promptCastVote(${c.id})" class="w-full py-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-accent hover:opacity-90 text-white font-bold text-xs transition">VOTE</button>`
+                    }
+                </div>
+            `).join('');
+        }
+
+        function renderHomeLeaderboard() {
+            const container = document.getElementById('home-leaderboard-preview');
+            container.innerHTML = state.contestants.slice(0, 4).map(c => `
+                <div class="flex items-center justify-between bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                    <div class="flex items-center space-x-3">
+                        <div class="font-black text-xs text-slate-500 w-4">${c.rank}</div>
+                        <img src="${c.photo}" class="w-9 h-9 rounded-xl object-cover">
+                        <div>
+                            <div class="text-xs font-bold text-white">${c.name}</div>
+                            <div class="text-[10px] text-slate-400">${c.number} • ${c.title}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-mono font-extrabold text-sm text-brand-500">${c.votePercentage}%</div>
+                        <div class="text-[10px] text-slate-500 font-mono">${c.voteCount.toLocaleString()} votes</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==========================================
+        // FAN WALL & FAN POLL LOGIC
+        // ==========================================
+        function openPostModal() { openModal('modal-post-fan-wall'); }
+        function openCreateCampaignModal() { openModal('modal-create-campaign'); }
+        function toggleDevModal() { openModal('modal-dev-info'); }
+
+        function handlePostFanWall(e) {
+            e.preventDefault();
+            const author = document.getElementById('fw-input-author').value;
+            const tag = document.getElementById('fw-input-tag').value;
+            const text = document.getElementById('fw-input-text').value;
+
+            state.fanPosts.unshift({
+                id: Date.now(),
+                author: author.startsWith('@') ? author : `@${author}`,
+                tag: tag,
+                text: text,
+                likes: 1,
+                time: 'Just now'
+            });
+
+            renderFanWall();
+            renderHomeFanBuzz();
+            closeModal('modal-post-fan-wall');
+            triggerToast('Your comment was posted to the Fan Wall!', 'success');
+        }
+
+        function likePost(pId) {
+            const p = state.fanPosts.find(item => item.id === pId);
+            if (p) {
+                p.likes += 1;
+                renderFanWall();
+                triggerToast('Liked fan post', 'info');
+            }
+        }
+
+        function votePoll(pollId, optionIndex) {
+            const poll = state.fanPolls.find(p => p.id === pollId);
+            if (!poll || poll.hasVoted) return;
+
+            poll.hasVoted = true;
+            poll.selectedOption = optionIndex;
+            poll.options[optionIndex].count += 1;
+            poll.totalVotes += 1;
+
+            // Recalculate percentages
+            poll.options.forEach(opt => {
+                opt.percent = Math.round((opt.count / poll.totalVotes) * 100);
+            });
+
+            renderFanPolls();
+            triggerToast('Poll response recorded!', 'success');
+        }
+
+        function handleCreateCampaign(e) {
+            e.preventDefault();
+            triggerToast('New Promotional Campaign Created Successfully', 'success');
+            closeModal('modal-create-campaign');
+        }
+
+        // ==========================================
+        // MODALS & TOAST UTILITIES
+        // ==========================================
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function triggerToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let borderColors = 'border-brand-500/50 bg-slate-900';
+            if (type === 'success') borderColors = 'border-emerald-500/50 bg-slate-900 text-emerald-400';
+            if (type === 'warning') borderColors = 'border-amber-500/50 bg-slate-900 text-amber-400';
+            if (type === 'error') borderColors = 'border-red-500/50 bg-slate-900 text-red-400';
+
+            toast.className = `glass-panel px-4 py-3 rounded-2xl border ${borderColors} text-xs font-bold shadow-xl flex items-center space-x-2 transition transform translate-y-2`;
+            toast.innerHTML = `<i class="fa-solid fa-bell"></i> <span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleFullscreenBroadcast() {
+            const frame = document.getElementById('broadcast-frame');
+            if (!document.fullscreenElement) {
+                frame.requestFullscreen().catch(err => triggerToast('Fullscreen view simulated', 'info'));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // ==========================================
+        // CHART.JS INITIALIZATIONS
+        // ==========================================
+        function initProducerTrendChart() {
+            const ctx = document.getElementById('producerTrendChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['20:00', '20:05', '20:10', '20:15', '20:20', '20:25', '20:30'],
+                    datasets: [{
+                        label: 'Votes / Second',
+                        data: [420, 680, 1100, 2400, 3100, 3842, 4100],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        function initAnalyticsCharts() {
+            // Chart 1: Episodes Trend
+            const ctx1 = document.getElementById('episodesChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Ep 01', 'Ep 02', 'Ep 03', 'Ep 04', 'Ep 05', 'Ep 06', 'Ep 07', 'Ep 08'],
+                    datasets: [{
+                        label: 'Total Audience Votes',
+                        data: [450000, 520000, 610000, 780000, 890000, 950000, 1120000, 1284592],
+                        backgroundColor: '#8b5cf6',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            // Chart 2: Reactions Doughnut
+            const ctx2 = document.getElementById('reactionsDoughnutChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Love ❤️', 'Fire 🔥', 'Applause 👏', 'Funny 😂', 'Shocked 😱', 'Sad 😢'],
+                    datasets: [{
+                        data: [12400, 9800, 4200, 1100, 620, 340],
+                        backgroundColor: ['#f43f5e', '#f59e0b', '#10b981', '#eab308', '#a855f7', '#3b82f6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: '#94a3b8' } } }
+                }
+            });
+        }
+
+        function renderHomeFanBuzz() {
+            const container = document.getElementById('home-fan-buzz');
+            container.innerHTML = state.fanPosts.slice(0, 2).map(p => `
+                <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800/80 space-y-1 text-xs">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="font-bold text-brand-accent">${p.author}</span>
+                        <span class="text-[10px]">${p.time}</span>
+                    </div>
+                    <p class="text-slate-200 text-xs">${p.text}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderFullContestants(filter = 'ALL') {
+            const container = document.getElementById('contestants-full-grid');
+            const list = filter === 'ALL' ? state.contestants : state.contestants.filter(c => c.status === filter);
+
+            container.innerHTML = list.map(c => `
+                <div class="glass-panel p-5 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between hover:border-brand-500/40 transition">
+                    <div class="space-y-3">
+                        <div class="relative rounded-2xl overflow-hidden aspect-square">
+                            <img src="${c.photo}" alt="${c.name}" class="w-full h-full object-cover">
+                            <div class="absolute top-3 left-3 bg-slate-950/90 backdrop-blur px-2.5 py-1 rounded-xl text-xs font-black text-white">${c.number}</div>
+                            ${getStatusBadge(c.status)}
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-brand-500">${c.title}</span>
+                                <span class="text-xs font-mono font-bold text-slate-400">Rank #${c.rank}</span>
+                            </div>
+                            <h3 class="text-lg font-extrabold text-white">${c.name}</h3>
+                            <p class="text-xs text-slate-400 line-clamp-2 mt-1">${c.bio}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 font-medium">Current Share</span>
+                            <span class="font-mono font-extrabold text-brand-accent">${c.votePercentage}%</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-brand-600 to-brand-accent h-full rounded-full" style="width: ${c.votePercentage}%"></div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-2">
+                            <button onclick="openContestantDetailModal(${c.id})" class="py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs border border-slate-800">
+                                View Profile
+                            </button>
+                            ${c.status === 'ELIMINATED'
+                                ? `<button disabled class="py-2.5 rounded-xl bg-slate-950 text-slate-600 font-bold text-xs cursor-not-allowed">ELIMINATED</button>`
+                                : `<button onclick="promptCastVote(${c.id})" class="py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-accent text-white font-extrabold text-xs shadow-md">VOTE NOW</button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterContestants(status) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === status) {
+                    btn.className = 'filter-btn active px-4 py-2 rounded-xl text-xs font-bold bg-brand-600 text-white';
+                } else {
+                    btn.className = 'filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800';
+                }
+            });
+            renderFullContestants(status);
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard-container');
+            const sorted = [...state.contestants].sort((a, b) => b.voteCount - a.voteCount);
+
+            container.innerHTML = sorted.map((c, idx) => {
+                const rankNum = idx + 1;
+                c.rank = rankNum;
+                let podiumIcon = '';
+                if (rankNum === 1) podiumIcon = '🥇 1st';
+                else if (rankNum === 2) podiumIcon = '🥈 2nd';
+                else if (rankNum === 3) podiumIcon = '🥉 3rd';
+                else podiumIcon = `#0${rankNum}`;
+
+                return `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900/80 p-4 rounded-2xl border ${rankNum === 1 ? 'border-brand-500/60 shadow-lg shadow-brand-600/10' : 'border-slate-800'} gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="font-black text-sm w-12 text-center py-1 rounded-xl ${rankNum === 1 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-slate-950 text-slate-400'}">
+                                ${podiumIcon}
+                            </div>
+                            <img src="${c.photo}" class="w-12 h-12 rounded-2xl object-cover border border-slate-700">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <h4 class="font-extrabold text-white text-base">${c.name}</h4>
+                                    <span class="text-xs font-bold ${c.trend.startsWith('+') ? 'text-emerald-400' : c.trend.startsWith('-') ? 'text-red-400' : 'text-slate-500'} font-mono">${c.trend}</span>
+                                </div>
+                                <div class="text-xs text-slate-400">${c.number} • ${c.title} • ${c.status}</div>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 max-w-xs space-y-1">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-slate-400">${c.voteCount.toLocaleString()} votes</span>
+                                <span class="font-bold text-brand-accent">${c.votePercentage}%</span>
+                            </div>
+                            <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                                <div class="bg-gradient-to-r from-brand-600 to-brand-accent h-full rounded-full transition-all duration-700" style="width: ${c.votePercentage}%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            ${c.status === 'ELIMINATED'
+                                ? `<button disabled class="px-5 py-2 rounded-xl bg-slate-950 text-slate-600 font-bold text-xs">ELIMINATED</button>`
+                                : `<button onclick="promptCastVote(${c.id})" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs shadow-md">QUICK VOTE</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFanWall(filter = 'ALL') {
+            const container = document.getElementById('fan-wall-grid');
+            const list = filter === 'ALL' ? state.fanPosts : state.fanPosts.filter(p => p.tag === filter);
+            container.innerHTML = list.map(p => `
+                <div class="glass-panel p-5 rounded-3xl border border-slate-800 space-y-3 flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-extrabold text-brand-accent">${p.author}</span>
+                            <span class="text-[10px] text-slate-500">${p.time}</span>
+                        </div>
+                        <p class="text-slate-200 text-sm leading-relaxed">${p.text}</p>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-800 text-xs">
+                        <span class="px-2.5 py-1 rounded-full bg-brand-600/20 text-brand-400 font-bold border border-brand-500/30">
+                            #${p.tag}
+                        </span>
+                        <div class="flex items-center space-x-3 text-slate-400 font-bold">
+                            <button onclick="likePost(${p.id})" class="hover:text-rose-500 transition flex items-center gap-1">
+                                <i class="fa-solid fa-heart text-rose-500"></i> ${p.likes}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderFanWallFilters() {
+            const container = document.getElementById('fan-wall-filters');
+            if (container) {
+                const tags = ['ALL', ...state.contestants.map(c => c.name)];
+                container.innerHTML = tags.map(tag => {
+                    const isActive = tag === 'ALL';
+                    return `<button onclick="filterFanWall('${tag}')" class="fw-filter ${isActive ? 'active bg-brand-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'} px-4 py-1.5 rounded-full text-xs font-bold transition">${tag === 'ALL' ? 'ALL POSTS' : tag}</button>`;
+                }).join('');
+            }
+        }
+
+        function filterFanWall(tag) {
+            document.querySelectorAll('.fw-filter').forEach(btn => {
+                if (btn.textContent.trim() === tag || (tag === 'ALL' && btn.textContent.trim() === 'ALL POSTS')) {
+                    btn.className = 'fw-filter active px-4 py-1.5 rounded-full text-xs font-bold bg-brand-600 text-white';
+                } else {
+                    btn.className = 'fw-filter px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800';
+                }
+            });
+            renderFanWall(tag);
+        }
+
+        function getStatusBadge(status) {
+            if (status === 'ACTIVE') return `<span class="absolute top-2 right-2 bg-emerald-500/90 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">ACTIVE</span>`;
+            if (status === 'SAFE') return `<span class="absolute top-2 right-2 bg-blue-500/90 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">SAFE</span>`;
+            if (status === 'AT RISK') return `<span class="absolute top-2 right-2 bg-amber-500/90 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">AT RISK</span>`;
+            return `<span class="absolute top-2 right-2 bg-red-600/90 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">ELIMINATED</span>`;
+        }
+
+        function renderFanPolls() {
+            const container = document.getElementById('fan-polls-container');
+            container.innerHTML = state.fanPolls.map(poll => `
+                <div class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-extrabold text-white text-lg max-w-md">${poll.title}</h3>
+                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${poll.status === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-500'}">
+                            ${poll.status}
+                        </span>
+                    </div>
+                    <div class="text-xs text-slate-400">Total Participants: <strong class="text-slate-200">${poll.totalVotes.toLocaleString()}</strong></div>
+
+                    <div class="space-y-3">
+                        ${poll.options.map((opt, oIdx) => `
+                            <div onclick="votePoll(${poll.id}, ${oIdx})" class="p-3.5 rounded-2xl border ${poll.selectedOption === oIdx ? 'border-brand-500 bg-brand-600/10' : 'border-slate-800 bg-slate-900/60'} hover:border-slate-700 cursor-pointer transition space-y-2">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="text-white">${opt.name}</span>
+                                    <span class="text-brand-accent font-mono">${opt.percent}%</span>
+                                </div>
+                                <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-gradient-to-r from-brand-600 to-cyan-400 h-full rounded-full" style="width: ${opt.percent}%"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProducerPreview() {
+            const container = document.getElementById('producer-mini-preview');
+            container.innerHTML = state.contestants.slice(0, 3).map(c => `
+                <div class="flex items-center justify-between bg-slate-900/90 p-1.5 rounded-lg border border-slate-800 text-[10px]">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-amber-400">0${c.rank}</span>
+                        <span class="font-bold text-white">${c.name}</span>
+                    </div>
+                    <span class="font-mono font-bold text-brand-accent">${c.votePercentage}%</span>
+                </div>
+            `).join('');
+        }
+
+        function renderBroadcastOverlay() {
+            const container = document.getElementById('broadcast-cards-container');
+            container.innerHTML = state.contestants.slice(0, 3).map(c => `
+                <div class="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between items-center text-center space-y-3 shadow-xl">
+                    <div class="relative">
+                        <img src="${c.photo}" class="w-24 h-24 rounded-2xl object-cover ring-4 ring-brand-500/40">
+                        <span class="absolute -top-2 -left-2 bg-brand-600 text-white font-black text-xs px-2 py-0.5 rounded-lg">#0${c.rank}</span>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">${c.title}</div>
+                        <div class="text-xl font-black text-white uppercase">${c.name}</div>
+                    </div>
+                    <div class="w-full bg-slate-950 p-2 rounded-xl border border-slate-800">
+                        <div class="text-3xl font-black font-mono text-brand-accent">${c.votePercentage}%</div>
+                        <div class="text-[10px] text-slate-400 font-mono">${c.voteCount.toLocaleString()} VOTES</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCampaigns() {
+            const container = document.getElementById('campaigns-grid');
+            container.innerHTML = state.campaigns.map(camp => `
+                <div class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${camp.status === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'}">
+                                ${camp.status}
+                            </span>
+                            <span class="text-xs font-bold text-brand-500">${camp.type}</span>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-white">${camp.name}</h3>
+                        <p class="text-xs text-slate-400">Duration: ${camp.start} - ${camp.end}</p>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800 grid grid-cols-2 gap-2 text-center text-xs">
+                        <div>
+                            <div class="text-[10px] text-slate-500">Reach</div>
+                            <div class="font-bold text-white mt-0.5">${camp.reach}</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-500">Engagement</div>
+                            <div class="font-bold text-brand-accent mt-0.5">${camp.engagement}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="triggerToast('Campaign settings loaded', 'info')" class="py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs border border-slate-800">
+                            Edit Campaign
+                        </button>
+                        <button onclick="triggerToast('Campaign paused by producer', 'warning')" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs">
+                            Pause
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProducerTable() {
+            const tbody = document.getElementById('producer-table-body');
+            if (tbody) {
+                tbody.innerHTML = state.contestants.map(c => `
+                    <tr class="border-b border-slate-800/40 text-slate-350">
+                        <td class="py-3 flex items-center space-x-3">
+                            <img src="${c.photo}" class="w-8 h-8 rounded-lg object-cover">
+                            <span class="font-bold text-white text-xs">${c.name}</span>
+                        </td>
+                        <td class="py-3 font-mono">${c.number}</td>
+                        <td class="py-3 font-mono">${c.voteCount.toLocaleString()}</td>
+                        <td class="py-3 font-mono font-bold text-brand-accent">${c.votePercentage}%</td>
+                        <td class="py-3">${getStatusBadge(c.status)}</td>
+                        <td class="py-3 text-right space-x-1">
+                            <button onclick="setContestantStatus(${c.id}, 'SAFE')" class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition text-[10px] font-bold">Safe</button>
+                            <button onclick="setContestantStatus(${c.id}, 'AT RISK')" class="px-2 py-1 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-white transition text-[10px] font-bold">At Risk</button>
+                            <button onclick="setContestantStatus(${c.id}, 'ELIMINATED')" class="px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition text-[10px] font-bold">Eliminate</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function setContestantStatus(id, newStatus) {
+            const c = state.contestants.find(item => item.id === id);
+            if (c) {
+                c.status = newStatus;
+                renderFullContestants();
+                renderHomeContestants();
+                renderLeaderboard();
+                renderProducerTable();
+                triggerToast(`Updated ${c.name} status to ${newStatus}`, 'success');
+            }
+        }
+    </script>
+</body>
+
+</html>
