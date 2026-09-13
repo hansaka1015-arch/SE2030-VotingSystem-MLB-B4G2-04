@@ -1,7 +1,9 @@
 -- ========================================================
 -- SE2030 Software Engineering - Group Y2-S1-MLB-B4G2-04
 -- Web-Based Voting System for Reality Show (BrightStar Media)
--- Database Schema Definition (MySQL)
+-- Database Schema Definition & Seed Data (MySQL)
+-- Role: Developer 4 (Frontend/UI & UC-05 Real-Time Analytics)
+-- Target: Week 10 Progress Evaluation (75% Target)
 -- ========================================================
 
 CREATE DATABASE IF NOT EXISTS votingsystem_db;
@@ -40,13 +42,17 @@ CREATE TABLE IF NOT EXISTS episodes (
 );
 
 -- 4. Contestants Table (Profiles & Elimination Status)
+-- Aligned with com.votingsystem.model.Contestant & ContestantDAO
 CREATE TABLE IF NOT EXISTS contestants (
-    contestant_id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     show_id INT NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    bio TEXT,
-    image_url VARCHAR(255),
-    status ENUM('ACTIVE', 'SAFE', 'ELIMINATED') DEFAULT 'ACTIVE',
+    contestant_code VARCHAR(20) NOT NULL DEFAULT '#01',
+    full_name VARCHAR(100) NOT NULL,
+    bio_summary TEXT,
+    profile_image_url VARCHAR(255),
+    status ENUM('ACTIVE', 'SAFE', 'AT RISK', 'ELIMINATED') DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (show_id) REFERENCES shows(show_id) ON DELETE CASCADE
 );
 
@@ -71,7 +77,7 @@ CREATE TABLE IF NOT EXISTS votes (
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('ACCEPTED', 'REJECTED', 'FLAGGED') DEFAULT 'ACCEPTED',
     FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (contestant_id) REFERENCES contestants(contestant_id),
+    FOREIGN KEY (contestant_id) REFERENCES contestants(id),
     FOREIGN KEY (episode_id) REFERENCES episodes(episode_id)
 );
 
@@ -84,3 +90,32 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     details TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ========================================================
+-- SEED DATA (For Evaluation Viva & Demonstration)
+-- ========================================================
+
+-- Insert Show
+INSERT INTO shows (show_id, title, description, season_number, status)
+VALUES (1, 'Voice of Lanka 2026', 'Premier nationwide television vocal reality competition.', 4, 'ACTIVE')
+ON DUPLICATE KEY UPDATE title=VALUES(title);
+
+-- Insert Live Episode
+INSERT INTO episodes (episode_id, show_id, episode_number, title, voting_start_time, voting_end_time, status)
+VALUES (1, 1, 8, 'Episode 08: Grand Finals', NOW(), DATE_ADD(NOW(), INTERVAL 3 HOUR), 'VOTING_OPEN')
+ON DUPLICATE KEY UPDATE title=VALUES(title);
+
+-- Insert Show Producer User
+INSERT INTO users (user_id, full_name, email, password_hash, role)
+VALUES (1, 'Hettiarachchi D.K.S.H.', 'producer@brightstar.media', 'sha256_hash_prod_2026', 'SHOW_PRODUCER')
+ON DUPLICATE KEY UPDATE full_name=VALUES(full_name);
+
+-- Insert 5 Official Contestants
+INSERT INTO contestants (id, show_id, contestant_code, full_name, bio_summary, profile_image_url, status)
+VALUES 
+(1, 1, '#01', 'Kavinda Perera', 'Celebrated for breathtaking acoustic renditions and flawless vocal pitch across live performance rounds.', NULL, 'ACTIVE'),
+(2, 1, '#02', 'Natasha Fernando', 'A powerhouse vocalist who captivates audiences nationwide with unmatched emotional resonance and dynamic range.', NULL, 'SAFE'),
+(3, 1, '#03', 'Sahan Wickramasinghe', 'Infuses high-octane rock energy, electrifying guitar solos, and raw vocal grit into every prime-time broadcast.', NULL, 'AT RISK'),
+(4, 1, '#04', 'Aanya Jayasuriya', 'Visionary performer blending modern electronic pop production with traditional percussion and sharp choreography.', NULL, 'ACTIVE'),
+(5, 1, '#05', 'Thilina Bandara', 'Brings authentic Sri Lankan folk narrative poetry, smooth acoustic warmth, and classical vocal ornamentation.', NULL, 'ELIMINATED')
+ON DUPLICATE KEY UPDATE full_name=VALUES(full_name), profile_image_url=VALUES(profile_image_url), status=VALUES(status);
