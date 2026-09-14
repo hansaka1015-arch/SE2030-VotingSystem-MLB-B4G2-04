@@ -1,14 +1,18 @@
 package org.example.voting.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.time.Instant;
 
-@Table("episodes")
+@Entity
+@Table(name = "episodes")
 public class Episode {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer episodeId;
     private Integer showId;
     private Integer episodeNumber;

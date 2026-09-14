@@ -1,14 +1,18 @@
 package org.example.voting.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.time.Instant;
 
-@Table("credit_wallets")
+@Entity
+@Table(name = "credit_wallets")
 public class CreditWallet {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer walletId;
     private Integer userId;
     private Integer balance;
