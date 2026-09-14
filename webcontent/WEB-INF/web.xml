@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <display-name>VoteSphere Lanka - Paid Vote &amp; Credit Management</display-name>
+
+    <welcome-file-list>
+        <welcome-file>buy-credits.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- Servlet Declarations & Mappings -->
+    <servlet>
+        <servlet-name>CreditStoreServlet</servlet-name>
+        <servlet-class>com.votesphere.servlet.CreditStoreServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreditStoreServlet</servlet-name>
+        <url-pattern>/store</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ProcessPaymentServlet</servlet-name>
+        <servlet-class>com.votesphere.servlet.ProcessPaymentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProcessPaymentServlet</servlet-name>
+        <url-pattern>/process-payment</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CreditHistoryServlet</servlet-name>
+        <servlet-class>com.votesphere.servlet.CreditHistoryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreditHistoryServlet</servlet-name>
+        <url-pattern>/history</url-pattern>
+    </servlet-mapping>
+
+    <!-- Session Configuration -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+</web-app>
