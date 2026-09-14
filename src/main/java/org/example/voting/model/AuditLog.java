@@ -1,14 +1,18 @@
 package org.example.voting.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.time.Instant;
 
-@Table("audit_logs")
+@Entity
+@Table(name = "audit_logs")
 public class AuditLog {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long logId;
     private String eventType;
     private Integer actorUserId; // can be null if the event is system-generated
