@@ -1,0 +1,17 @@
+org\example\voting\model\Episode.class
+org\example\voting\controller\VoteController.class
+org\example\voting\repository\EpisodeRepository.class
+org\example\voting\config\AsyncConfig.class
+org\example\voting\repository\AuditLogRepository.class
+org\example\voting\service\FraudAnalyzerService.class
+org\example\voting\event\VoteRecordedEvent.class
+org\example\voting\model\AuditLog.class
+org\example\voting\repository\VoteRepository.class
+org\example\voting\model\CreditWallet.class
+org\example\voting\model\Vote.class
+org\example\voting\dto\VoteRequest.class
+org\example\voting\service\VoteService.class
+org\example\voting\repository\CreditWalletRepository.class
+org\example\voting\model\User.class
+org\example\voting\dto\VoteIngestResponse.class
+org\example\voting\VotingSystemApplication.class
