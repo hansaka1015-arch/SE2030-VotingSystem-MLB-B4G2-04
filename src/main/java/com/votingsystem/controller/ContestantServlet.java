@@ -50,29 +50,75 @@ public class ContestantServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
-        if ("updateStatus".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String status = request.getParameter("status");
-            boolean success = contestantDAO.updateContestantStatus(id, status);
-            result.put("success", success);
-        } else if ("updateBio".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String bio = request.getParameter("bio");
-            boolean success = contestantDAO.updateContestantBio(id, bio);
-            result.put("success", success);
-        } else if ("add".equals(action)) {
-            String code = request.getParameter("code");
-            String name = request.getParameter("name");
-            String bio = request.getParameter("bio");
-            String image = request.getParameter("image");
-            int showId = Integer.parseInt(request.getParameter("showId"));
+        try {
+            if ("add".equals(action)) {
+                String code = request.getParameter("code");
+                String name = request.getParameter("name");
+                String bio = request.getParameter("bio");
+                String image = request.getParameter("image");
+                String status = request.getParameter("status");
+                if (status == null || status.trim().isEmpty()) {
+                    status = "ACTIVE";
+                }
 
-            Contestant contestant = new Contestant(code, name, bio, image, "ACTIVE", showId);
-            boolean success = contestantDAO.addContestant(contestant);
-            result.put("success", success);
-        } else {
+                int showId = 1;
+                String showParam = request.getParameter("showId");
+                if (showParam != null && !showParam.isEmpty()) {
+                    showId = Integer.parseInt(showParam);
+                }
+
+                Contestant contestant = new Contestant(code, name, bio, image, status, showId);
+                boolean success = contestantDAO.addContestant(contestant);
+                result.put("success", success);
+                result.put("id", contestant.getId());
+                result.put("message", success ? "Contestant added successfully" : "Failed to add contestant");
+
+            } else if ("update".equals(action) || "edit".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String code = request.getParameter("code");
+                String name = request.getParameter("name");
+                String bio = request.getParameter("bio");
+                String image = request.getParameter("image");
+                String status = request.getParameter("status");
+
+                int showId = 1;
+                String showParam = request.getParameter("showId");
+                if (showParam != null && !showParam.isEmpty()) {
+                    showId = Integer.parseInt(showParam);
+                }
+
+                Contestant contestant = new Contestant(id, code, name, bio, image, status, showId);
+                boolean success = contestantDAO.updateContestant(contestant);
+                result.put("success", success);
+                result.put("message", success ? "Contestant updated successfully" : "Failed to update contestant");
+
+            } else if ("delete".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                boolean success = contestantDAO.deleteContestant(id);
+                result.put("success", success);
+                result.put("message", success ? "Contestant removed successfully" : "Failed to remove contestant");
+
+            } else if ("updateStatus".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String status = request.getParameter("status");
+                boolean success = contestantDAO.updateContestantStatus(id, status);
+                result.put("success", success);
+                result.put("message", success ? "Status updated" : "Failed to update status");
+
+            } else if ("updateBio".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String bio = request.getParameter("bio");
+                boolean success = contestantDAO.updateContestantBio(id, bio);
+                result.put("success", success);
+                result.put("message", success ? "Bio updated" : "Failed to update bio");
+
+            } else {
+                result.put("success", false);
+                result.put("message", "Invalid action specified: " + action);
+            }
+        } catch (Exception e) {
             result.put("success", false);
-            result.put("message", "Invalid action specified");
+            result.put("message", "Server error: " + e.getMessage());
         }
 
         out.print(gson.toJson(result));

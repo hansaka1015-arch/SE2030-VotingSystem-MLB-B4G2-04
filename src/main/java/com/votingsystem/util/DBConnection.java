@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DBConnection {
     // Database connection credentials
     private static final String URL = "jdbc:mysql://localhost:3306/votingsystem_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";    private static final String USER = "root";
-    private static final String PASSWORD = "root"; // Oyage MySQL Workbench password eka danna
+    private static final String PASSWORD = ""; //
 
     static {
         try {

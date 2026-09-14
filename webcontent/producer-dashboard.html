@@ -162,14 +162,19 @@
                 <span>DB: SYNCED</span>
             </div>
 
-            <div class="hidden sm:flex flex-col items-end mr-2">
-                <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Voting Closes In</span>
-                <span id="global-timer" class="font-mono text-xs font-bold text-brand-accent">02 : 14 : 36</span>
+            <!-- Global Voting Window Timer -->
+            <div class="hidden sm:flex flex-col items-end justify-center text-right">
+                <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold leading-none mb-1">Voting Closes In</span>
+                <span id="global-timer" class="font-mono text-xs font-bold text-brand-accent tracking-wider leading-none">02 : 14 : 36</span>
             </div>
 
-            <button onclick="triggerToast('System notifications up to date', 'info')" class="relative p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            <!-- Notification Bell Icon Button -->
+            <button id="btn-notifications" onclick="triggerToast('System notifications up to date', 'info')" class="relative w-8 h-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 transition-all flex items-center justify-center flex-shrink-0 shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-500/50" title="System Notifications">
                 <i class="fa-solid fa-bell text-xs"></i>
-                <span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                <span class="absolute top-1.5 right-1.5 flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500 ring-1 ring-slate-900"></span>
+                </span>
             </button>
 
             <!-- User Profile Avatar Badge -->
@@ -287,7 +292,7 @@
                                     <i class="fa-solid fa-clock text-brand-500 text-base"></i>
                                     <div>
                                         <div class="text-[9px] uppercase font-bold text-slate-400">Window Closes In</div>
-                                        <div class="font-mono font-bold text-base text-white">02 : 14 : 36</div>
+                                        <div id="hero-countdown-timer" class="font-mono font-bold text-base text-white tracking-wider">02 : 14 : 36</div>
                                     </div>
                                 </div>
                                 <button onclick="switchTab('contestants')" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-md transition flex items-center gap-2">
@@ -469,7 +474,41 @@
                     </button>
                 </div>
 
-                <!-- Feed Filter Chips -->
+                <!-- Producer Broadcast Moderation Desk Bar -->
+                <div id="fan-wall-moderation-bar" class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                            <div>
+                                <div class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                                    Fan Reaction Moderation Desk
+                                    <span class="px-2 py-0.5 rounded text-[9px] bg-brand-500/20 text-brand-300 font-mono font-bold border border-brand-500/30">PRODUCER CONTROLS</span>
+                                </div>
+                                <p class="text-[11px] text-slate-400">Review viewer comments, approve for live broadcast lower-third, edit or purge inappropriate content</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2 text-xs flex-wrap gap-1.5">
+                            <span class="text-slate-400 text-[11px] font-bold">Queue:</span>
+                            <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+                                <button onclick="setFanModerationFilter('ALL')" id="fw-mod-filter-all" class="px-3 py-1 rounded-lg text-xs font-bold transition bg-brand-600 text-white shadow-sm">
+                                    All (<span id="count-mod-all">0</span>)
+                                </button>
+                                <button onclick="setFanModerationFilter('APPROVED')" id="fw-mod-filter-approved" class="px-3 py-1 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+                                    Approved (<span id="count-mod-approved">0</span>)
+                                </button>
+                                <button onclick="setFanModerationFilter('PENDING')" id="fw-mod-filter-pending" class="px-3 py-1 rounded-lg text-xs font-bold transition text-amber-400 hover:text-amber-300">
+                                    Pending (<span id="count-mod-pending">0</span>)
+                                </button>
+                                <button onclick="setFanModerationFilter('HIDDEN')" id="fw-mod-filter-hidden" class="px-3 py-1 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+                                    Hidden (<span id="count-mod-hidden">0</span>)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feed Filter Chips (Filter by Contestant) -->
                 <div class="flex flex-wrap items-center gap-2" id="fan-wall-filters">
                     <button onclick="filterFanWall('ALL')" class="fw-filter active px-4 py-1.5 rounded-full text-xs font-bold bg-brand-600 text-white">ALL POSTS</button>
                 </div>
@@ -647,14 +686,20 @@
 
                 <!-- Contestant Management Panel -->
                 <div class="glass-panel p-5 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between flex-wrap gap-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h3 class="font-extrabold text-white text-base">Contestant Elimination & Status Control</h3>
-                            <p class="text-xs text-slate-400">Manage contestant safety, risk nominations, and active statuses in real time</p>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                                <span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">CONTESTANT ROSTER CRUD</span>
+                            </div>
+                            <h3 class="font-extrabold text-white text-base">Contestants Roster & Elimination Controls</h3>
+                            <p class="text-xs text-slate-400">Register new performers, edit bios & statuses, and manage live competition qualifications</p>
                         </div>
-                        <button onclick="triggerToast('Contestant status modifications take effect across all public views instantly', 'info')" class="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300">
-                            Status Guidelines
-                        </button>
+                        <div class="flex items-center space-x-2.5">
+                            <button onclick="openAddContestantModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-md transition flex items-center gap-2">
+                                <i class="fa-solid fa-user-plus"></i> Add New Contestant
+                            </button>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -957,37 +1002,360 @@
         </div>
     </div>
 
-    <!-- ACCOUNT PROFILE MODAL -->
-    <div id="modal-dev-info" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-2xl border border-slate-800 p-6 space-y-4 text-center">
-            <div class="relative w-16 h-16 mx-auto">
-                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-600/30 via-slate-800 to-slate-900 border border-brand-500/50 text-brand-300 font-mono font-extrabold text-xl flex items-center justify-center ring-2 ring-brand-500/20 select-none shadow-lg">
-                    HD
+    <!-- MODAL: ADD NEW CONTESTANT -->
+    <div id="modal-add-contestant" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-add-contestant')">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-slate-800 p-6 space-y-5 max-h-[90vh] overflow-y-auto relative shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-brand-600/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-white">Register New Contestant</h3>
+                        <p class="text-[11px] text-slate-400">Add an official performer profile to the live competition database</p>
+                    </div>
                 </div>
-                <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-slate-950"></span>
+                <button type="button" onclick="closeModal('modal-add-contestant')" class="w-7 h-7 rounded-lg bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-800">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddContestant(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Full Name *</label>
+                        <input type="text" id="add-contestant-name" required placeholder="e.g. Kasun Dias" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Contestant Code *</label>
+                        <input type="text" id="add-contestant-code" required placeholder="e.g. #06" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Stage Title / Style</label>
+                        <input type="text" id="add-contestant-title" placeholder="e.g. The Soulful Balladeer" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Initial Status</label>
+                        <select id="add-contestant-status" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-semibold">
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="SAFE">SAFE</option>
+                            <option value="AT RISK">AT RISK</option>
+                            <option value="ELIMINATED">ELIMINATED</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Age</label>
+                        <input type="number" id="add-contestant-age" value="23" min="16" max="99" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Origin Location</label>
+                        <input type="text" id="add-contestant-location" placeholder="e.g. Galle, LK" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Bio Summary</label>
+                    <textarea id="add-contestant-bio" rows="2" placeholder="Write a short summary of their vocal talent and background..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Profile Image URL (Optional)</label>
+                    <input type="text" id="add-contestant-image" placeholder="https://..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+                </div>
+
+                <div class="flex items-center space-x-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-contestant')" class="w-1/2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus text-xs"></i> Register Contestant
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT CONTESTANT -->
+    <div id="modal-edit-contestant" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-edit-contestant')">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-slate-800 p-6 space-y-5 max-h-[90vh] overflow-y-auto relative shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-user-pen"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-white">Edit Contestant Profile</h3>
+                        <p class="text-[11px] text-slate-400">Update contestant metadata, stage title, and broadcast status</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeModal('modal-edit-contestant')" class="w-7 h-7 rounded-lg bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-800">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleEditContestant(event)" class="space-y-4">
+                <input type="hidden" id="edit-contestant-id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Full Name *</label>
+                        <input type="text" id="edit-contestant-name" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Contestant Code *</label>
+                        <input type="text" id="edit-contestant-code" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Stage Title / Style</label>
+                        <input type="text" id="edit-contestant-title" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Status</label>
+                        <select id="edit-contestant-status" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-semibold">
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="SAFE">SAFE</option>
+                            <option value="AT RISK">AT RISK</option>
+                            <option value="ELIMINATED">ELIMINATED</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Age</label>
+                        <input type="number" id="edit-contestant-age" min="16" max="99" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Origin Location</label>
+                        <input type="text" id="edit-contestant-location" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Bio Summary</label>
+                    <textarea id="edit-contestant-bio" rows="3" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Profile Image URL</label>
+                    <input type="text" id="edit-contestant-image" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+                </div>
+
+                <div class="flex items-center space-x-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-edit-contestant')" class="w-1/2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk text-xs"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRM DELETE CONTESTANT -->
+    <div id="modal-delete-contestant" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-delete-contestant')">
+        <div class="glass-panel w-full max-w-md rounded-3xl border border-rose-500/40 p-6 space-y-5 text-center relative shadow-2xl">
+            <input type="hidden" id="delete-contestant-id">
+            <div class="w-14 h-14 rounded-2xl bg-rose-500/20 text-rose-400 text-2xl flex items-center justify-center mx-auto border border-rose-500/40">
+                <i class="fa-solid fa-trash-can"></i>
             </div>
             <div>
-                <h3 class="text-lg font-black text-white">Hettiarachchi D.K.S.H.</h3>
-                <p class="text-xs text-brand-500 font-bold mt-0.5">Developer 4 - Frontend/UI & Real-Time Analytics Lead</p>
-                <p class="text-[11px] text-slate-400 font-mono mt-0.5">SLIIT SE2030 | MLB-B4G2-04</p>
+                <h3 class="text-lg font-black text-white">Delete Contestant Record?</h3>
+                <p class="text-xs text-slate-400 mt-1">Are you sure you want to remove <span id="delete-contestant-name-display" class="font-bold text-white">Contestant</span> from the live roster?</p>
             </div>
-            <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-xs text-left space-y-2">
-                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                    <span class="text-slate-400">Assigned Module</span>
-                    <strong class="text-white">UC-05 Real-Time Analytics</strong>
+
+            <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 text-xs text-slate-300 text-left space-y-1">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Contestant ID:</span>
+                    <span id="delete-contestant-code-display" class="font-mono font-bold text-brand-400">#01</span>
                 </div>
-                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                    <span class="text-slate-400">Station / Console</span>
-                    <strong class="text-white">Colombo Studio 01</strong>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-400">System Role</span>
-                    <strong class="text-emerald-400">SHOW_PRODUCER</strong>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Action Impact:</span>
+                    <span class="text-rose-400 font-bold">Removed from active leaderboards</span>
                 </div>
             </div>
-            <div class="space-y-2 pt-2">
-                <button onclick="triggerToast('Console profile active', 'info'); closeModal('modal-dev-info');" class="w-full py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition">
-                    Close
+
+            <div class="flex items-center space-x-3">
+                <button type="button" onclick="closeModal('modal-delete-contestant')" class="w-1/2 py-2.5 rounded-xl bg-slate-900 border border-slate-800 font-bold text-xs text-slate-300 hover:bg-slate-800 transition">
+                    Cancel
+                </button>
+                <button type="button" onclick="handleDeleteContestant()" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs shadow-md transition">
+                    CONFIRM DELETE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT FAN WALL MESSAGE (MODERATION) -->
+    <div id="modal-edit-fan-post" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-edit-fan-post')">
+        <div class="glass-panel w-full max-w-md rounded-3xl border border-slate-800 p-6 space-y-5 relative shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-message"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-white">Moderate Fan Post</h3>
+                        <p class="text-[11px] text-slate-400">Edit, censor, or adjust broadcast approval status</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeModal('modal-edit-fan-post')" class="w-7 h-7 rounded-lg bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-800">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleEditFanPost(event)" class="space-y-4">
+                <input type="hidden" id="edit-fan-post-id">
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Author Handle</label>
+                        <input type="text" id="edit-fan-post-author" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Status</label>
+                        <select id="edit-fan-post-status" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-bold">
+                            <option value="APPROVED">APPROVED</option>
+                            <option value="PENDING">PENDING</option>
+                            <option value="HIDDEN">HIDDEN</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Supporting Tag</label>
+                    <select id="edit-fan-post-tag" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                        <!-- Populated dynamically via JS -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Comment Text</label>
+                    <textarea id="edit-fan-post-text" rows="3" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+
+                <div class="flex items-center space-x-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-edit-fan-post')" class="w-1/2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk text-xs"></i> Update Post
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ACCOUNT PROFILE MODAL (OPERATOR CONSOLE CARD) -->
+    <div id="modal-dev-info" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-dev-info')">
+        <div class="glass-panel w-full max-w-md rounded-3xl border border-slate-800 p-6 sm:p-7 space-y-5 relative shadow-2xl overflow-hidden">
+            <!-- Ambient Lighting Glows -->
+            <div class="absolute -top-20 -left-20 w-44 h-44 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Top Header Bar with Dismiss Icon -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 relative z-10">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">OPERATOR CONSOLE CREDENTIALS</span>
+                </div>
+                <button onclick="closeModal('modal-dev-info')" class="w-7 h-7 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-800 focus:outline-none" title="Close Profile">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Profile Avatar & Identity Header -->
+            <div class="text-center space-y-3 relative z-10">
+                <!-- Avatar with integrated smooth online badge -->
+                <div class="relative inline-block mx-auto">
+                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-600/30 via-slate-800 to-slate-950 border border-brand-500/40 text-brand-300 font-mono font-black text-2xl flex items-center justify-center ring-1 ring-slate-700 select-none shadow-xl">
+                        HD
+                    </div>
+                    <!-- Clean Online Pulse Dot (anchored smoothly at corner with dark isolating ring) -->
+                    <span class="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center" title="Active on Console">
+                        <span class="animate-ping absolute inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 ring-2 ring-slate-950"></span>
+                    </span>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-black text-white tracking-tight">Hettiarachchi D.K.S.H.</h3>
+                    
+                    <!-- Clean Role Badges Hierarchy -->
+                    <div class="flex flex-wrap items-center justify-center gap-1.5 mt-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-bold">
+                            <i class="fa-solid fa-sliders text-[10px]"></i> Frontend & Analytics Lead
+                        </span>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-mono font-medium">
+                            Developer 04
+                        </span>
+                    </div>
+
+                    <p class="text-[11px] text-slate-400 font-mono mt-1.5">
+                        Voice of Lanka 2026 • SLIIT SE2030 (MLB-B4G2-04)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Professional Broadcast Console Info Boxes -->
+            <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-3.5 space-y-2 text-xs text-left relative z-10">
+                <!-- Assigned Module -->
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/60">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 flex-shrink-0">
+                            <i class="fa-solid fa-chart-line text-xs"></i>
+                        </div>
+                        <div>
+                            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Assigned Module</div>
+                            <div class="text-white font-bold text-xs">UC-05 Real-Time Telemetry & Analytics</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-brand-300 border border-brand-500/20">LEAD</span>
+                </div>
+
+                <!-- Station / Console -->
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/60">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 flex-shrink-0">
+                            <i class="fa-solid fa-tower-broadcast text-xs"></i>
+                        </div>
+                        <div>
+                            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Station / Console</div>
+                            <div class="text-white font-bold text-xs">Colombo Studio 01 • Master Control Desk</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-sky-300 border border-sky-500/20">DESK 01</span>
+                </div>
+
+                <!-- System Role -->
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/60">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                            <i class="fa-solid fa-shield-halved text-xs"></i>
+                        </div>
+                        <div>
+                            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">System Role</div>
+                            <div class="text-white font-bold text-xs">Show Producer & Voting Console Admin</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">ACTIVE</span>
+                </div>
+            </div>
+
+            <!-- Footer Action Button -->
+            <div class="pt-1 relative z-10">
+                <button onclick="triggerToast('Operator session verified & credentials active', 'success'); closeModal('modal-dev-info');" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check text-xs"></i> Close & Continue Session
                 </button>
             </div>
         </div>
@@ -1004,6 +1372,8 @@
         const state = {
             currentRole: 'viewer', // 'viewer' | 'producer'
             votingState: 'ACTIVE', // 'ACTIVE' | 'PAUSED' | 'ENDED'
+            countdownSeconds: 2 * 3600 + 14 * 60 + 36, // 02 : 14 : 36 (8076 seconds)
+            countdownTimerId: null,
             totalVotes: 1284592,
             votesPerMin: 3842,
             totalReactions: 28492,
@@ -1016,6 +1386,8 @@
                 Impact: 620,
                 Support: 340
             },
+            fanModerationFilter: 'ALL', // 'ALL' | 'APPROVED' | 'PENDING' | 'HIDDEN'
+            fanTagFilter: 'ALL',
             isBackendConnected: false,
             contestants: [
                 {
@@ -1105,9 +1477,11 @@
                 }
             ],
             fanPosts: [
-                { id: 101, author: '@NatashaVocalClub', text: 'Natasha absolutely delivered with that soaring high note! Outstanding performance of the season.', tag: 'Natasha Fernando', likes: 2420, time: '2m ago' },
-                { id: 102, author: '@KavindaMusicLanka', text: 'Kavinda Perera is showing unmatched precision and vocal technique. Keep voting everyone!', tag: 'Kavinda Perera', likes: 1842, time: '5m ago' },
-                { id: 103, author: '@SahanRockNation', text: 'Sahan needs our votes right now! Make sure he stays safe from tonight\'s elimination.', tag: 'Sahan Wickramasinghe', likes: 934, time: '12m ago' }
+                { id: 101, author: '@NatashaVocalClub', text: 'Natasha absolutely delivered with that soaring high note! Outstanding performance of the season.', tag: 'Natasha Fernando', likes: 2420, time: '2m ago', status: 'APPROVED' },
+                { id: 102, author: '@KavindaMusicLanka', text: 'Kavinda Perera is showing unmatched precision and vocal technique. Keep voting everyone!', tag: 'Kavinda Perera', likes: 1842, time: '5m ago', status: 'APPROVED' },
+                { id: 103, author: '@SahanRockNation', text: 'Sahan needs our votes right now! Make sure he stays safe from tonight\'s elimination.', tag: 'Sahan Wickramasinghe', likes: 934, time: '12m ago', status: 'APPROVED' },
+                { id: 104, author: '@RhythmWatcher', text: 'Audio mix on the second verse sounded slightly unbalanced in the studio monitors.', tag: 'General Show', likes: 12, time: '15m ago', status: 'PENDING' },
+                { id: 105, author: '@SpamBot99', text: 'Check out this free crypto token air drop link bit.ly/spam-link-not-allowed', tag: 'Spam', likes: 0, time: '25m ago', status: 'HIDDEN' }
             ],
             fanPolls: [
                 {
@@ -1181,6 +1555,87 @@
         }
 
         // ==========================================
+        // DYNAMIC VOTING COUNTDOWN TIMER ENGINE
+        // ==========================================
+        function formatCountdownTime(totalSecs) {
+            if (totalSecs < 0) totalSecs = 0;
+            const hours = Math.floor(totalSecs / 3600);
+            const minutes = Math.floor((totalSecs % 3600) / 60);
+            const seconds = totalSecs % 60;
+
+            const pad = (num) => String(num).padStart(2, '0');
+            return `${pad(hours)} : ${pad(minutes)} : ${pad(seconds)}`;
+        }
+
+        function updateCountdownDisplays() {
+            const timeFormatted = formatCountdownTime(state.countdownSeconds);
+
+            // 1. Update Global Header Countdown Timer
+            const globalTimer = document.getElementById('global-timer');
+            if (globalTimer) {
+                if (state.votingState === 'ENDED' || state.countdownSeconds <= 0) {
+                    globalTimer.textContent = '00 : 00 : 00';
+                    globalTimer.classList.remove('text-brand-accent');
+                    globalTimer.classList.add('text-red-400');
+                } else if (state.votingState === 'PAUSED') {
+                    globalTimer.textContent = timeFormatted;
+                    globalTimer.classList.remove('text-brand-accent', 'text-red-400');
+                    globalTimer.classList.add('text-amber-400');
+                } else {
+                    globalTimer.textContent = timeFormatted;
+                    globalTimer.classList.remove('text-red-400', 'text-amber-400');
+                    globalTimer.classList.add('text-brand-accent');
+                }
+            }
+
+            // 2. Update Public Viewer Hero Countdown Timer
+            const heroTimer = document.getElementById('hero-countdown-timer');
+            if (heroTimer) {
+                if (state.votingState === 'ENDED' || state.countdownSeconds <= 0) {
+                    heroTimer.textContent = '00 : 00 : 00';
+                    heroTimer.classList.remove('text-white', 'text-amber-400');
+                    heroTimer.classList.add('text-red-400');
+                } else if (state.votingState === 'PAUSED') {
+                    heroTimer.textContent = timeFormatted;
+                    heroTimer.classList.remove('text-white', 'text-red-400');
+                    heroTimer.classList.add('text-amber-400');
+                } else {
+                    heroTimer.textContent = timeFormatted;
+                    heroTimer.classList.remove('text-red-400', 'text-amber-400');
+                    heroTimer.classList.add('text-white');
+                }
+            }
+        }
+
+        function initVotingCountdownTimer() {
+            if (state.countdownTimerId) {
+                clearInterval(state.countdownTimerId);
+            }
+
+            // Immediately display initial time without delay
+            updateCountdownDisplays();
+
+            // Real-time interval decrements every second
+            state.countdownTimerId = setInterval(() => {
+                // Decrement only when voting gate is ACTIVE
+                if (state.votingState === 'ACTIVE') {
+                    if (state.countdownSeconds > 0) {
+                        state.countdownSeconds--;
+                        updateCountdownDisplays();
+
+                        // Auto-close voting window when time reaches 0
+                        if (state.countdownSeconds === 0) {
+                            setVotingState('ENDED');
+                            triggerToast('Official Voting Window has closed (00:00:00)!', 'error');
+                        }
+                    } else {
+                        updateCountdownDisplays();
+                    }
+                }
+            }, 1000);
+        }
+
+        // ==========================================
         // INITIALIZATION & TAB LOGIC
         // ==========================================
         window.onload = function () {
@@ -1197,10 +1652,14 @@
             renderBroadcastOverlay();
             renderCampaigns();
             renderProducerTable();
+            updateFanModerationCounts();
 
             // Initialize Charts
             initProducerTrendChart();
             initAnalyticsCharts();
+
+            // Initialize Dynamic Countdown Timer
+            initVotingCountdownTimer();
 
             // Attempt Backend MySQL Servlet Connection
             checkBackendConnection();
@@ -1260,18 +1719,24 @@
             state.currentRole = role;
             const viewerBtn = document.getElementById('mode-viewer-btn');
             const producerBtn = document.getElementById('mode-producer-btn');
+            const modBar = document.getElementById('fan-wall-moderation-bar');
 
             if (role === 'viewer') {
-                viewerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 bg-brand-600 text-white shadow-sm';
-                producerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-2';
+                if (viewerBtn) viewerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 bg-brand-600 text-white shadow-sm';
+                if (producerBtn) producerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-2';
+                if (modBar) modBar.classList.add('hidden');
                 switchTab('public-home');
                 triggerToast('Switched to Public Viewer Experience', 'info');
             } else {
-                producerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 bg-emerald-600 text-white shadow-sm';
-                viewerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-2';
+                if (producerBtn) producerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 bg-emerald-600 text-white shadow-sm';
+                if (viewerBtn) viewerBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center gap-2';
+                if (modBar) modBar.classList.remove('hidden');
                 switchTab('producer-dashboard');
                 triggerToast('Switched to TV Producer Control Room', 'info');
             }
+
+            renderFanWall();
+            updateFanModerationCounts();
         }
 
         // ==========================================
@@ -1292,20 +1757,27 @@
             btnEnd.className = inactiveClass;
 
             if (newState === 'ACTIVE') {
+                if (state.countdownSeconds <= 0) {
+                    state.countdownSeconds = 2 * 3600 + 14 * 60 + 36;
+                }
                 btnStart.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-sm flex items-center gap-1.5';
                 badge.className = 'px-3 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30 flex items-center gap-1.5 text-xs';
                 badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVE & VOTING OPEN';
                 triggerToast('Producer Switch: Live Voting Gate is ACTIVE', 'success');
+                updateCountdownDisplays();
             } else if (newState === 'PAUSED') {
                 btnPause.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow-sm flex items-center gap-1.5';
                 badge.className = 'px-3 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30 flex items-center gap-1.5 text-xs';
                 badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> PAUSED • INGESTION SUSPENDED';
                 triggerToast('Producer Switch: Voting Window Temporarily PAUSED', 'warning');
+                updateCountdownDisplays();
             } else if (newState === 'ENDED') {
                 btnEnd.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-red-600 text-white shadow-sm flex items-center gap-1.5';
                 badge.className = 'px-3 py-0.5 rounded-full bg-red-500/10 text-red-400 font-bold border border-red-500/30 flex items-center gap-1.5 text-xs';
                 badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400"></span> FINALIZED • VOTING CLOSED';
                 triggerToast('Producer Switch: Voting Window ENDED', 'error');
+                state.countdownSeconds = 0;
+                updateCountdownDisplays();
             }
         }
 
@@ -1730,44 +2202,149 @@
             }).join('');
         }
 
-        function renderFanWall(filter = 'ALL') {
+        function getFanPostModerationBadge(status) {
+            if (status === 'APPROVED') return `<span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">APPROVED</span>`;
+            if (status === 'PENDING') return `<span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase font-mono bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">PENDING REVIEW</span>`;
+            return `<span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase font-mono bg-slate-800 text-slate-400 border border-slate-700">HIDDEN</span>`;
+        }
+
+        function updateFanModerationCounts() {
+            const allCnt = state.fanPosts.length;
+            const appCnt = state.fanPosts.filter(p => p.status === 'APPROVED').length;
+            const penCnt = state.fanPosts.filter(p => p.status === 'PENDING').length;
+            const hidCnt = state.fanPosts.filter(p => p.status === 'HIDDEN').length;
+
+            const elAll = document.getElementById('count-mod-all');
+            const elApp = document.getElementById('count-mod-approved');
+            const elPen = document.getElementById('count-mod-pending');
+            const elHid = document.getElementById('count-mod-hidden');
+
+            if (elAll) elAll.textContent = allCnt;
+            if (elApp) elApp.textContent = appCnt;
+            if (elPen) elPen.textContent = penCnt;
+            if (elHid) elHid.textContent = hidCnt;
+        }
+
+        function setFanModerationFilter(filter) {
+            state.fanModerationFilter = filter;
+            const filters = ['ALL', 'APPROVED', 'PENDING', 'HIDDEN'];
+            filters.forEach(f => {
+                const btn = document.getElementById(`fw-mod-filter-${f.toLowerCase()}`);
+                if (!btn) return;
+                if (f === filter) {
+                    btn.className = 'px-3 py-1 rounded-lg text-xs font-bold transition bg-brand-600 text-white shadow-sm';
+                } else {
+                    btn.className = 'px-3 py-1 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+                }
+            });
+            renderFanWall();
+        }
+
+        function renderFanWall(tagFilter = null) {
             const container = document.getElementById('fan-wall-grid');
             if (!container) return;
-            const list = filter === 'ALL' ? state.fanPosts : state.fanPosts.filter(p => p.tag === filter);
-            container.innerHTML = list.map(p => `
-                <div class="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="font-bold text-brand-500">${p.author}</span>
-                            <span class="text-[10px] text-slate-500 font-mono">${p.time}</span>
-                        </div>
-                        <p class="text-slate-200 text-xs leading-relaxed">${p.text}</p>
-                    </div>
 
-                    <div class="flex justify-between items-center pt-2.5 border-t border-slate-800 text-xs">
-                        <span class="px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 font-bold border border-slate-800 text-[10px]">
-                            ${p.tag}
-                        </span>
-                        <button onclick="likePost(${p.id})" class="hover:text-rose-400 transition flex items-center gap-1.5 text-slate-400 font-mono text-xs">
-                            <i class="fa-solid fa-heart text-rose-500 text-[11px]"></i> ${p.likes}
-                        </button>
+            if (tagFilter !== null) {
+                state.fanTagFilter = tagFilter;
+            }
+
+            const isProducer = state.currentRole === 'producer';
+
+            let list = [...state.fanPosts];
+
+            // 1. Role & Moderation Filtering
+            if (!isProducer) {
+                // Public viewers only ever see approved posts
+                list = list.filter(p => p.status === 'APPROVED');
+            } else {
+                // Producers can view all, approved, pending, or hidden
+                if (state.fanModerationFilter && state.fanModerationFilter !== 'ALL') {
+                    list = list.filter(p => p.status === state.fanModerationFilter);
+                }
+            }
+
+            // 2. Contestant Tag Filtering
+            if (state.fanTagFilter && state.fanTagFilter !== 'ALL') {
+                list = list.filter(p => p.tag === state.fanTagFilter);
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-500 text-xs space-y-2">
+                        <i class="fa-solid fa-comments text-2xl text-slate-600"></i>
+                        <div>No fan comments found for the current filter criteria.</div>
                     </div>
-                </div>
-            `).join('');
+                `;
+                return;
+            }
+
+            container.innerHTML = list.map(p => {
+                const statusBadge = getFanPostModerationBadge(p.status || 'APPROVED');
+
+                return `
+                    <div class="glass-panel p-4 rounded-2xl border ${p.status === 'HIDDEN' ? 'border-slate-800/40 opacity-60 bg-slate-950/40' : p.status === 'PENDING' ? 'border-amber-500/30 bg-amber-950/10' : 'border-slate-800'} space-y-3 flex flex-col justify-between transition hover:border-slate-700">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start text-xs">
+                                <div>
+                                    <span class="font-bold text-brand-500">${p.author}</span>
+                                    <div class="text-[10px] text-slate-500 font-mono">${p.time}</div>
+                                </div>
+                                ${isProducer ? statusBadge : ''}
+                            </div>
+                            <p class="text-slate-200 text-xs leading-relaxed">${p.text}</p>
+                        </div>
+
+                        <div class="space-y-2.5 pt-2.5 border-t border-slate-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 font-bold border border-slate-800 text-[10px]">
+                                    ${p.tag}
+                                </span>
+                                <button onclick="likePost(${p.id})" class="hover:text-rose-400 transition flex items-center gap-1.5 text-slate-400 font-mono text-xs">
+                                    <i class="fa-solid fa-heart text-rose-500 text-[11px]"></i> ${p.likes}
+                                </button>
+                            </div>
+
+                            ${isProducer ? `
+                            <div class="grid grid-cols-4 gap-1.5 pt-2 border-t border-slate-800/60">
+                                ${p.status !== 'APPROVED' ? `
+                                    <button onclick="approveFanPost(${p.id})" class="py-1 px-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 hover:text-white text-emerald-400 text-[10px] font-bold border border-emerald-500/20 transition flex items-center justify-center gap-1" title="Approve for Broadcast">
+                                        <i class="fa-solid fa-check"></i> <span class="hidden sm:inline">Approve</span>
+                                    </button>
+                                ` : `
+                                    <button disabled class="py-1 px-1 rounded-lg bg-emerald-500/5 text-emerald-500/40 text-[10px] font-bold border border-emerald-500/10 cursor-default flex items-center justify-center gap-1">
+                                        <i class="fa-solid fa-circle-check"></i> <span class="hidden sm:inline">Live</span>
+                                    </button>
+                                `}
+                                <button onclick="openEditFanPostModal(${p.id})" class="py-1 px-1 rounded-lg bg-sky-500/10 hover:bg-sky-500 hover:text-white text-sky-400 text-[10px] font-bold border border-sky-500/20 transition flex items-center justify-center gap-1" title="Edit Comment">
+                                    <i class="fa-solid fa-pen"></i> <span class="hidden sm:inline">Edit</span>
+                                </button>
+                                <button onclick="toggleHideFanPost(${p.id})" class="py-1 px-1 rounded-lg ${p.status === 'HIDDEN' ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-white border-amber-500/20' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'} text-[10px] font-bold border transition flex items-center justify-center gap-1" title="${p.status === 'HIDDEN' ? 'Unhide Comment' : 'Hide Comment'}">
+                                    <i class="fa-solid ${p.status === 'HIDDEN' ? 'fa-eye' : 'fa-eye-slash'}"></i> <span class="hidden sm:inline">${p.status === 'HIDDEN' ? 'Show' : 'Hide'}</span>
+                                </button>
+                                <button onclick="deleteFanPost(${p.id})" class="py-1 px-1 rounded-lg bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-400 text-[10px] font-bold border border-rose-500/20 transition flex items-center justify-center gap-1" title="Delete Comment">
+                                    <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Delete</span>
+                                </button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderFanWallFilters() {
             const container = document.getElementById('fan-wall-filters');
             if (container) {
-                const tags = ['ALL', ...state.contestants.map(c => c.name)];
+                const tags = ['ALL', 'General Show', ...state.contestants.map(c => c.name)];
                 container.innerHTML = tags.map(tag => {
-                    const isActive = tag === 'ALL';
+                    const isActive = (state.fanTagFilter || 'ALL') === tag;
                     return `<button onclick="filterFanWall('${tag}')" class="fw-filter ${isActive ? 'active bg-brand-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'} px-3.5 py-1 rounded-full text-xs font-bold transition">${tag === 'ALL' ? 'ALL POSTS' : tag}</button>`;
                 }).join('');
             }
         }
 
         function filterFanWall(tag) {
+            state.fanTagFilter = tag;
             document.querySelectorAll('.fw-filter').forEach(btn => {
                 if (btn.textContent.trim() === tag || (tag === 'ALL' && btn.textContent.trim() === 'ALL POSTS')) {
                     btn.className = 'fw-filter active px-3.5 py-1 rounded-full text-xs font-bold bg-brand-600 text-white';
@@ -1776,6 +2353,79 @@
                 }
             });
             renderFanWall(tag);
+        }
+
+        function approveFanPost(id) {
+            const p = state.fanPosts.find(item => item.id === id);
+            if (p) {
+                p.status = 'APPROVED';
+                updateFanModerationCounts();
+                renderFanWall();
+                renderHomeFanBuzz();
+                triggerToast(`Approved comment by ${p.author} for broadcast`, 'success');
+            }
+        }
+
+        function toggleHideFanPost(id) {
+            const p = state.fanPosts.find(item => item.id === id);
+            if (p) {
+                p.status = p.status === 'HIDDEN' ? 'APPROVED' : 'HIDDEN';
+                updateFanModerationCounts();
+                renderFanWall();
+                renderHomeFanBuzz();
+                triggerToast(p.status === 'HIDDEN' ? `Hidden comment by ${p.author}` : `Restored comment by ${p.author}`, 'warning');
+            }
+        }
+
+        function deleteFanPost(id) {
+            const idx = state.fanPosts.findIndex(item => item.id === id);
+            if (idx !== -1) {
+                const author = state.fanPosts[idx].author;
+                state.fanPosts.splice(idx, 1);
+                updateFanModerationCounts();
+                renderFanWall();
+                renderHomeFanBuzz();
+                triggerToast(`Purged comment by ${author}`, 'error');
+            }
+        }
+
+        function openEditFanPostModal(id) {
+            const p = state.fanPosts.find(item => item.id === id);
+            if (!p) return;
+            document.getElementById('edit-fan-post-id').value = p.id;
+            document.getElementById('edit-fan-post-author').value = p.author;
+            document.getElementById('edit-fan-post-status').value = p.status || 'APPROVED';
+            document.getElementById('edit-fan-post-text').value = p.text;
+
+            const tagSelect = document.getElementById('edit-fan-post-tag');
+            if (tagSelect) {
+                const tags = ['General Show', ...state.contestants.map(c => c.name)];
+                tagSelect.innerHTML = tags.map(t => `<option value="${t}" ${t === p.tag ? 'selected' : ''}>${t}</option>`).join('');
+            }
+
+            openModal('modal-edit-fan-post');
+        }
+
+        function handleEditFanPost(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('edit-fan-post-id').value);
+            const author = document.getElementById('edit-fan-post-author').value;
+            const status = document.getElementById('edit-fan-post-status').value;
+            const tag = document.getElementById('edit-fan-post-tag').value;
+            const text = document.getElementById('edit-fan-post-text').value;
+
+            const p = state.fanPosts.find(item => item.id === id);
+            if (p) {
+                p.author = author.startsWith('@') ? author : `@${author}`;
+                p.status = status;
+                p.tag = tag;
+                p.text = text;
+                updateFanModerationCounts();
+                renderFanWall();
+                renderHomeFanBuzz();
+                closeModal('modal-edit-fan-post');
+                triggerToast(`Updated post by ${p.author}`, 'success');
+            }
         }
 
         function getStatusBadge(status, isAbsolute = true) {
@@ -1897,22 +2547,40 @@
             const tbody = document.getElementById('producer-table-body');
             if (!tbody) return;
             tbody.innerHTML = state.contestants.map(c => `
-                <tr class="border-b border-slate-800/60 text-slate-300">
+                <tr class="border-b border-slate-800/60 text-slate-300 hover:bg-slate-900/30 transition">
                     <td class="py-3 flex items-center space-x-3">
                         ${renderInitialsAvatar(c, 'w-8 h-8', 'text-[11px]', 'rounded-lg')}
                         <div>
-                            <div class="font-bold text-white text-xs">${c.name}</div>
-                            <div class="text-[10px] text-slate-500">${c.title}</div>
+                            <div class="font-bold text-white text-xs flex items-center gap-1.5">
+                                ${c.name}
+                                <span class="text-[9px] text-slate-500 font-mono">ID:${c.id}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-500 truncate max-w-[140px] sm:max-w-xs">${c.title} &bull; ${c.location || 'LK'}</div>
                         </div>
                     </td>
-                    <td class="py-3 font-mono text-xs">${c.number}</td>
+                    <td class="py-3 font-mono text-xs font-bold text-slate-200">${c.number}</td>
                     <td class="py-3 font-mono text-xs">${c.voteCount.toLocaleString()}</td>
                     <td class="py-3 font-mono font-bold text-white text-xs">${c.votePercentage}%</td>
                     <td class="py-3">${getStatusBadge(c.status, false)}</td>
-                    <td class="py-3 text-right space-x-1">
-                        <button onclick="setContestantStatus(${c.id}, 'SAFE')" class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition text-[10px] font-bold border border-blue-500/20">Safe</button>
-                        <button onclick="setContestantStatus(${c.id}, 'AT RISK')" class="px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-white transition text-[10px] font-bold border border-amber-500/20">At Risk</button>
-                        <button onclick="setContestantStatus(${c.id}, 'ELIMINATED')" class="px-2.5 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition text-[10px] font-bold border border-red-500/20">Eliminate</button>
+                    <td class="py-3 text-right">
+                        <div class="inline-flex items-center gap-1 flex-wrap justify-end">
+                            <!-- Status Badges / Toggles -->
+                            <button onclick="setContestantStatus(${c.id}, 'SAFE')" class="px-2 py-1 rounded ${c.status === 'SAFE' ? 'bg-blue-600 text-white shadow-sm' : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white'} transition text-[10px] font-bold border border-blue-500/30" title="Set Safe">Safe</button>
+                            <button onclick="setContestantStatus(${c.id}, 'AT RISK')" class="px-2 py-1 rounded ${c.status === 'AT RISK' ? 'bg-amber-600 text-white shadow-sm animate-pulse' : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-white'} transition text-[10px] font-bold border border-amber-500/30" title="Set At Risk">At Risk</button>
+                            <button onclick="setContestantStatus(${c.id}, 'ELIMINATED')" class="px-2 py-1 rounded ${c.status === 'ELIMINATED' ? 'bg-red-600 text-white shadow-sm' : 'bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white'} transition text-[10px] font-bold border border-red-500/30" title="Set Eliminated">Eliminate</button>
+
+                            <span class="h-4 w-px bg-slate-800 mx-0.5"></span>
+
+                            <!-- Edit Modal Button -->
+                            <button onclick="openEditContestantModal(${c.id})" class="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-300 hover:bg-indigo-600 hover:text-white transition text-[10px] font-bold border border-indigo-500/30 flex items-center gap-1" title="Edit Contestant Profile">
+                                <i class="fa-solid fa-user-pen"></i> Edit
+                            </button>
+
+                            <!-- Delete Modal Button -->
+                            <button onclick="confirmDeleteContestant(${c.id})" class="px-2 py-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-600 hover:text-white transition text-[10px] font-bold border border-rose-500/30" title="Delete Contestant">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
@@ -1933,10 +2601,185 @@
             }
         }
 
+        // ==========================================
+        // CONTESTANT CRUD MODALS & CONTROLLERS
+        // ==========================================
+        function openAddContestantModal() {
+            const nextIndex = state.contestants.length + 1;
+            const nextCode = nextIndex < 10 ? `#0${nextIndex}` : `#${nextIndex}`;
+
+            document.getElementById('add-contestant-name').value = '';
+            document.getElementById('add-contestant-code').value = nextCode;
+            document.getElementById('add-contestant-title').value = '';
+            document.getElementById('add-contestant-status').value = 'ACTIVE';
+            document.getElementById('add-contestant-age').value = '22';
+            document.getElementById('add-contestant-location').value = 'Colombo, LK';
+            document.getElementById('add-contestant-bio').value = '';
+            document.getElementById('add-contestant-image').value = '';
+
+            openModal('modal-add-contestant');
+        }
+
+        function handleAddContestant(e) {
+            e.preventDefault();
+            const name = document.getElementById('add-contestant-name').value.trim();
+            const code = document.getElementById('add-contestant-code').value.trim();
+            const title = document.getElementById('add-contestant-title').value.trim() || 'Vocal Performer';
+            const status = document.getElementById('add-contestant-status').value;
+            const age = parseInt(document.getElementById('add-contestant-age').value) || 22;
+            const location = document.getElementById('add-contestant-location').value.trim() || 'Colombo, LK';
+            const bio = document.getElementById('add-contestant-bio').value.trim();
+            const image = document.getElementById('add-contestant-image').value.trim();
+
+            if (!name || !code) {
+                triggerToast('Please provide contestant name and code', 'warning');
+                return;
+            }
+
+            const maxId = state.contestants.reduce((m, c) => Math.max(m, c.id), 0);
+            const newId = maxId + 1;
+
+            const newContestant = {
+                id: newId,
+                number: code,
+                name: name,
+                title: title,
+                age: age,
+                location: location,
+                occupation: title,
+                status: status,
+                voteCount: 0,
+                votePercentage: 0,
+                trend: 'NEW',
+                rank: state.contestants.length + 1,
+                bio: bio || `${name} is an official competitor in Voice of Lanka Season 4.`,
+                journey: 'Joined the live broadcast roster.',
+                media: []
+            };
+
+            state.contestants.push(newContestant);
+            recalcRanksAndPercentages();
+
+            renderHomeContestants();
+            renderHomeLeaderboard();
+            renderFullContestants();
+            renderLeaderboard();
+            renderProducerPreview();
+            renderBroadcastOverlay();
+            renderProducerTable();
+            renderFanWallFilters();
+
+            closeModal('modal-add-contestant');
+            triggerToast(`Contestant ${name} registered successfully!`, 'success');
+
+            // Dispatch background sync to Java Servlet
+            syncAddContestantBackend(newContestant);
+        }
+
+        function openEditContestantModal(id) {
+            const c = state.contestants.find(item => item.id === id);
+            if (!c) return;
+
+            document.getElementById('edit-contestant-id').value = c.id;
+            document.getElementById('edit-contestant-name').value = c.name;
+            document.getElementById('edit-contestant-code').value = c.number;
+            document.getElementById('edit-contestant-title').value = c.title || '';
+            document.getElementById('edit-contestant-status').value = c.status || 'ACTIVE';
+            document.getElementById('edit-contestant-age').value = c.age || 22;
+            document.getElementById('edit-contestant-location').value = c.location || '';
+            document.getElementById('edit-contestant-bio').value = c.bio || '';
+            document.getElementById('edit-contestant-image').value = c.image || '';
+
+            openModal('modal-edit-contestant');
+        }
+
+        function handleEditContestant(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('edit-contestant-id').value);
+            const name = document.getElementById('edit-contestant-name').value.trim();
+            const code = document.getElementById('edit-contestant-code').value.trim();
+            const title = document.getElementById('edit-contestant-title').value.trim();
+            const status = document.getElementById('edit-contestant-status').value;
+            const age = parseInt(document.getElementById('edit-contestant-age').value) || 22;
+            const location = document.getElementById('edit-contestant-location').value.trim();
+            const bio = document.getElementById('edit-contestant-bio').value.trim();
+            const image = document.getElementById('edit-contestant-image').value.trim();
+
+            const c = state.contestants.find(item => item.id === id);
+            if (!c) return;
+
+            c.name = name;
+            c.number = code;
+            c.title = title || c.title;
+            c.status = status;
+            c.age = age;
+            c.location = location || c.location;
+            c.bio = bio;
+            if (image) c.image = image;
+
+            recalcRanksAndPercentages();
+
+            renderHomeContestants();
+            renderHomeLeaderboard();
+            renderFullContestants();
+            renderLeaderboard();
+            renderProducerPreview();
+            renderBroadcastOverlay();
+            renderProducerTable();
+            renderFanWallFilters();
+
+            closeModal('modal-edit-contestant');
+            triggerToast(`Updated profile for ${name}!`, 'success');
+
+            // Dispatch background sync to Java Servlet
+            syncUpdateContestantBackend(c);
+        }
+
+        function confirmDeleteContestant(id) {
+            const c = state.contestants.find(item => item.id === id);
+            if (!c) return;
+
+            document.getElementById('delete-contestant-id').value = c.id;
+            const nameEl = document.getElementById('delete-contestant-name-display');
+            const codeEl = document.getElementById('delete-contestant-code-display');
+
+            if (nameEl) nameEl.textContent = c.name;
+            if (codeEl) codeEl.textContent = `${c.number} (ID: ${c.id})`;
+
+            openModal('modal-delete-contestant');
+        }
+
+        function handleDeleteContestant() {
+            const id = parseInt(document.getElementById('delete-contestant-id').value);
+            const idx = state.contestants.findIndex(item => item.id === id);
+            if (idx === -1) return;
+
+            const name = state.contestants[idx].name;
+            state.contestants.splice(idx, 1);
+
+            recalcRanksAndPercentages();
+
+            renderHomeContestants();
+            renderHomeLeaderboard();
+            renderFullContestants();
+            renderLeaderboard();
+            renderProducerPreview();
+            renderBroadcastOverlay();
+            renderProducerTable();
+            renderFanWallFilters();
+
+            closeModal('modal-delete-contestant');
+            triggerToast(`Contestant ${name} was removed from the roster.`, 'error');
+
+            // Dispatch background sync to Java Servlet
+            syncDeleteContestantBackend(id);
+        }
+
         function renderHomeFanBuzz() {
             const container = document.getElementById('home-fan-buzz');
             if (!container) return;
-            container.innerHTML = state.fanPosts.slice(0, 2).map(p => `
+            const approvedPosts = state.fanPosts.filter(p => p.status === 'APPROVED');
+            container.innerHTML = approvedPosts.slice(0, 2).map(p => `
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 space-y-1 text-xs">
                     <div class="flex justify-between items-center text-slate-400">
                         <span class="font-bold text-brand-500">${p.author}</span>
@@ -1950,29 +2793,46 @@
         // ==========================================
         // FAN ACTIONS & MODAL CONTROLLERS
         // ==========================================
-        function openPostModal() { openModal('modal-post-fan-wall'); }
+        function openPostModal() {
+            const selectTag = document.getElementById('fw-input-tag');
+            if (selectTag) {
+                selectTag.innerHTML = [
+                    '<option value="General Show">General Show</option>',
+                    ...state.contestants.map(c => `<option value="${c.name}">${c.name} (${c.number})</option>`)
+                ].join('');
+            }
+            openModal('modal-post-fan-wall');
+        }
         function openCreateCampaignModal() { openModal('modal-create-campaign'); }
         function toggleDevModal() { openModal('modal-dev-info'); }
 
         function handlePostFanWall(e) {
             e.preventDefault();
-            const author = document.getElementById('fw-input-author').value;
+            const author = document.getElementById('fw-input-author').value.trim();
             const tag = document.getElementById('fw-input-tag').value;
-            const text = document.getElementById('fw-input-text').value;
+            const text = document.getElementById('fw-input-text').value.trim();
+            const isProducer = state.currentRole === 'producer';
+            const initialStatus = isProducer ? 'APPROVED' : 'PENDING';
 
             state.fanPosts.unshift({
                 id: Date.now(),
                 author: author.startsWith('@') ? author : `@${author}`,
                 tag: tag,
                 text: text,
-                likes: 1,
-                time: 'Just now'
+                likes: 0,
+                time: 'Just now',
+                status: initialStatus
             });
 
+            updateFanModerationCounts();
             renderFanWall();
             renderHomeFanBuzz();
             closeModal('modal-post-fan-wall');
-            triggerToast('Your comment was posted to the Fan Wall!', 'success');
+            if (isProducer) {
+                triggerToast('Comment posted and immediately approved for broadcast!', 'success');
+            } else {
+                triggerToast('Comment submitted! It is now pending producer review.', 'info');
+            }
         }
 
         function likePost(pId) {
@@ -2106,7 +2966,7 @@
         async function syncDatabaseWithBackend() {
             triggerToast('Querying MySQL Database via /api/contestants...', 'info');
             try {
-                const response = await fetch('api/contestants?showId=1');
+                const response = await fetch('/votingsystem/api/contestants?showId=1');
                 if (response.ok) {
                     const data = await response.json();
                     triggerToast(`Synchronized ${data.length} contestants with MySQL Database!`, 'success');
@@ -2128,6 +2988,68 @@
                         action: 'updateStatus',
                         id: id,
                         status: status
+                    })
+                });
+            } catch (err) {
+                // Silently fallback in standalone demo mode
+            }
+        }
+
+        async function syncAddContestantBackend(c) {
+            try {
+                const res = await fetch('api/contestants', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'add',
+                        fullName: c.name,
+                        contestantCode: c.number,
+                        bioSummary: c.bio,
+                        profileImageUrl: c.image || '',
+                        status: c.status,
+                        showId: 1
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.id) {
+                        c.id = data.id;
+                    }
+                }
+            } catch (err) {
+                // Silently fallback in standalone demo mode
+            }
+        }
+
+        async function syncUpdateContestantBackend(c) {
+            try {
+                await fetch('api/contestants', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'update',
+                        id: c.id,
+                        fullName: c.name,
+                        contestantCode: c.number,
+                        bioSummary: c.bio,
+                        profileImageUrl: c.image || '',
+                        status: c.status,
+                        showId: 1
+                    })
+                });
+            } catch (err) {
+                // Silently fallback in standalone demo mode
+            }
+        }
+
+        async function syncDeleteContestantBackend(id) {
+            try {
+                await fetch('api/contestants', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'delete',
+                        id: id
                     })
                 });
             } catch (err) {
