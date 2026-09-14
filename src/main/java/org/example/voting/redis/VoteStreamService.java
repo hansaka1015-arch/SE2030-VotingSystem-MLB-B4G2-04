@@ -293,6 +293,11 @@ public class VoteStreamService {
      * @return A map containing vote processing counts
      */
     public java.util.Map<String, Object> getProcessingStats() {
-        return redisTemplate.opsForHash().entries(VOTE_COUNTS_KEY);
+        java.util.Map<Object, Object> rawMap = redisTemplate.opsForHash().entries(VOTE_COUNTS_KEY);
+        java.util.Map<String, Object> stringMap = new java.util.HashMap<>();
+        for (java.util.Map.Entry<Object, Object> entry : rawMap.entrySet()) {
+            stringMap.put(entry.getKey().toString(), entry.getValue());
+        }
+        return stringMap;
     }
 }
