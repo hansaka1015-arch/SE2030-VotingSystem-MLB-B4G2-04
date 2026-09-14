@@ -33,9 +33,6 @@ public class VoteService {
     private CreditWalletRepository creditWalletRepository;
 
     @Autowired
-    private VoteCountRepository voteCountRepository;
-
-    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     @Value("${voting.free-vote-limit-per-episode:5}")

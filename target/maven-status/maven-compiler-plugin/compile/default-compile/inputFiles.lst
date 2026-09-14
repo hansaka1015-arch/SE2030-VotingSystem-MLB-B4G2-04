@@ -1,0 +1,17 @@
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\config\AsyncConfig.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\controller\VoteController.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\dto\VoteIngestResponse.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\dto\VoteRequest.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\event\VoteRecordedEvent.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\model\AuditLog.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\model\CreditWallet.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\model\Episode.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\model\User.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\model\Vote.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\repository\AuditLogRepository.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\repository\CreditWalletRepository.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\repository\EpisodeRepository.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\repository\VoteRepository.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\service\FraudAnalyzerService.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\service\VoteService.java
+C:\Users\brian\OneDrive\Desktop\SE group Project\SE2030-VotingSystem-MLB-B4G2-04\src\main\java\org\example\voting\VotingSystemApplication.java
